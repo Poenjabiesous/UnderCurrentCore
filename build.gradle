@@ -1,0 +1,100 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+		jcenter()
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+		classpath 'eu.appsatori:gradle-fatjar-plugin:0.2-rc1'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:0.8'
+    }
+}
+
+apply plugin: 'shadow'
+
+shadow {
+    classifier = 'shade' 
+    artifactSet {
+        include 'undercurrentcore'
+    }
+    relocation {
+        pattern = 'argo'
+        shadedPattern = 'undercurrentcore.argo'
+    }
+    relocation {
+        pattern = 'org.apache'
+        shadedPattern = 'undercurrentcore.org.apache'
+    }
+    relocation {
+        pattern = 'org.cometd'
+        shadedPattern = 'undercurrentcore.org.cometd'
+    }
+    relocation {
+        pattern = 'org.eclipse'
+        shadedPattern = 'undercurrentcore.org.eclipse'
+    }
+}
+
+apply plugin: 'forge'
+
+version = "0.0.1"
+group= "undercurrentcore" 
+archivesBaseName = "UnderCurrentCore"
+
+minecraft {
+    version = "1.7.10-10.13.2.1291"
+    runDir = "eclipse"
+}
+
+dependencies {
+    compile 'org.eclipse.jetty.aggregate:jetty-all:9.0.0.RC2'
+	compile 'javax.servlet:javax.servlet-api:3.0.1'
+	compile 'com.google.code.gson:gson:1.7.2'
+}
+
+processResources
+{
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    // replace stuff in mcmod.info, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+                
+        // replace version and mcversion
+        expand 'version':project.version, 'mcversion':project.minecraft.version
+    }
+        
+    // copy everything else, thats not the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+configurations {
+    external
+    compile.extendsFrom external
+}
+
+dependencies {
+	external 'org.eclipse.jetty.aggregate:jetty-all:9.0.0.RC2'
+	external 'javax.servlet:javax.servlet-api:3.0.1'
+	external 'com.google.code.gson:gson:1.7.2'
+}
+
+jar {
+    from { configurations.external.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+task shade(dependsOn: "shadow")
+
+idea {module{inheritOutputDirs = true }}

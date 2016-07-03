@@ -1,0 +1,43 @@
+package api.undercurrent.iface.editorTypes;
+
+/**
+ * Created by Niel on 10/16/2015.
+ */
+public class InfoEditorType extends EditorType {
+
+    public String fieldName;
+    public String displayName;
+    public String displayDescription;
+    public String fieldValue;
+
+    public InfoEditorType(String fieldName, String displayName, String displayDescription, String fieldValue) throws Exception {
+        super(EditorTypes.INFO);
+        this.fieldName = fieldName;
+        this.displayName = displayName;
+        this.displayDescription = displayDescription;
+        this.fieldValue = fieldValue;
+        validateValue();
+    }
+
+    public String getFieldName() {
+        return fieldName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public String getDisplayDescription() {
+        return displayDescription;
+    }
+
+    public String getFieldValue() {
+        return fieldValue;
+    }
+
+    @Override
+    public void validateValue() throws Exception {
+
+    }
+}
+
