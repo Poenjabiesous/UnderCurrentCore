@@ -12,6 +12,7 @@ eclipse
 *.iws
 *.ipr
 *.iml
+*.txt
 .classpath
 .project
 .settings
@@ -23,3 +24,5 @@ saves
 resourcepacks
 mods
 logs
+config
+
