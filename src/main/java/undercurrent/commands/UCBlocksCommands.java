@@ -1,6 +1,6 @@
 package undercurrent.commands;
 
-import api.undercurrent.iface.UCTileEntity;
+import api.undercurrent.iface.UCTile;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -74,7 +74,7 @@ public class UCBlocksCommands extends CommandBase {
                         MovingObjectPosition mop = player.rayTrace(5.0D, 1.0F);
 
                         if (mop != null && mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-                            if (player.worldObj.getTileEntity(mop.blockX, mop.blockY, mop.blockZ) instanceof UCTileEntity) {
+                            if (player.worldObj.getTileEntity(mop.blockX, mop.blockY, mop.blockZ) instanceof UCTile) {
                                 UCBlockDTO block = new UCBlockDTO(mop.blockX, mop.blockY, mop.blockZ, player.worldObj.provider.dimensionId, params[1].toString(), "");
                                 boolean updated = data.updateBlockName(player.getUniqueID().toString(), block);
                                 if (updated) {

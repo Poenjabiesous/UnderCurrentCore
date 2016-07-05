@@ -1,6 +1,6 @@
 package undercurrent;
 
-import api.undercurrent.iface.UCTileEntity;
+import api.undercurrent.iface.UCTile;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
@@ -39,7 +39,7 @@ public class UCEventHandler {
     @SubscribeEvent
     public void onBlockPlaced(BlockEvent.PlaceEvent event) {
         if (event.player != null && !event.player.worldObj.isRemote) {
-            if (event.player instanceof EntityPlayer && event.placedBlock instanceof BlockContainer && ((BlockContainer) event.placedBlock).createNewTileEntity(event.player.worldObj, 0) instanceof UCTileEntity) {
+            if (event.player instanceof EntityPlayer && event.placedBlock instanceof BlockContainer && ((BlockContainer) event.placedBlock).createNewTileEntity(event.player.worldObj, 0) instanceof UCTile) {
                 UCPlayersWorldData data = (UCPlayersWorldData) event.player.worldObj.perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
 
                 boolean added = data.addBlockToPlayer(event.player.getUniqueID().toString(), new UCBlockDTO(event.x, event.y, event.z, event.player.worldObj.provider.dimensionId, "new" + event.block.getLocalizedName(), RandomStringUtils.randomAlphabetic(10)));
@@ -56,7 +56,7 @@ public class UCEventHandler {
     @SubscribeEvent
     public void onBlockBroken(BlockEvent.BreakEvent event) {
         if (event.getPlayer() != null && !event.getPlayer().worldObj.isRemote) {
-            if (event.getPlayer() instanceof EntityPlayer && event.block instanceof BlockContainer && ((BlockContainer) event.block).createNewTileEntity(event.getPlayer().worldObj, 0) instanceof UCTileEntity) {
+            if (event.getPlayer() instanceof EntityPlayer && event.block instanceof BlockContainer && ((BlockContainer) event.block).createNewTileEntity(event.getPlayer().worldObj, 0) instanceof UCTile) {
                 UCPlayersWorldData data = (UCPlayersWorldData) event.getPlayer().worldObj.perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
                 boolean removed = data.removeBlockFromPlayer(event.getPlayer().getUniqueID().toString(), new UCBlockDTO(event.x, event.y, event.z, event.getPlayer().worldObj.provider.dimensionId, "", ""));
                 if (removed) {

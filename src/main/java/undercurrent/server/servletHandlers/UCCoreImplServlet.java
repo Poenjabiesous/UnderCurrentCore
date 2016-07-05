@@ -1,10 +1,10 @@
 package undercurrent.server.servletHandlers;
 
-import api.undercurrent.iface.UCTileEntity;
-import com.google.common.base.Throwables;
+import api.undercurrent.iface.UCTile;
 import com.google.gson.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.DimensionManager;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import undercurrent.persist.UCBlockDTO;
@@ -114,7 +114,7 @@ public class UCCoreImplServlet extends HttpServlet {
 
             JsonObject swapper = new JsonObject();
 
-            UCTileEntity te = (UCTileEntity) DimensionManager.getWorld(dim).getTileEntity(x, y, z);
+            TileEntity te = DimensionManager.getWorld(dim).getTileEntity(x, y, z);
 
             if (te == null) {
                 RequestReturnObject rro = new RequestReturnObject(false, "Cannot execute for player due to: " + ResponseTypes.WORLD_TE_DOES_NOT_EXIST.toString() + ":: No tile entity found for coordinates: " + x + ", " + y + ", " + z);
