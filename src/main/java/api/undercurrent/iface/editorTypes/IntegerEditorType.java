@@ -4,12 +4,8 @@ package api.undercurrent.iface.editorTypes;
  */
 public class IntegerEditorType extends EditorType {
 
-    public String fieldName;
-    public int fieldValue;
-    public String displayName;
-    public String displayDescription;
-    public int minValue;
-    public int maxValue;
+    private int minValue;
+    private int maxValue;
 
     public IntegerEditorType(String fieldName, int fieldValue, String displayName, String displayDescription, int minValue, int maxValue) {
         super(EditorTypes.INT);
@@ -26,7 +22,7 @@ public class IntegerEditorType extends EditorType {
     }
 
     public int getFieldValue() {
-        return fieldValue;
+        return (Integer) fieldValue;
     }
 
     public String getDisplayName() {

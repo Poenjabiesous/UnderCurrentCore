@@ -1,4 +1,4 @@
-package undercurrent.proxy;
+package undercurrentcore.proxy;
 
 public class CommonProxy {
 

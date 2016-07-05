@@ -5,13 +5,9 @@ package api.undercurrent.iface.editorTypes;
  */
 public class DoubleEditorType extends EditorType {
 
-    public String fieldName;
-    public double fieldValue;
-    public String displayName;
-    public String displayDescription;
-    public int fieldPrecision;
-    public double maxValue;
-    public double minValue;
+    private int fieldPrecision;
+    private double maxValue;
+    private double minValue;
 
     public DoubleEditorType(String fieldName, double fieldValue, String displayName, String displayDescription, int fieldPrecision, double maxValue, double minValue) throws Exception {
         super(EditorTypes.DOUBLE);
@@ -30,7 +26,7 @@ public class DoubleEditorType extends EditorType {
     }
 
     public double getFieldValue() {
-        return fieldValue;
+        return (Double) fieldValue;
     }
 
     public String getDisplayName() {

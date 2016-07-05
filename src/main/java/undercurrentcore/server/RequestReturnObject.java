@@ -1,4 +1,4 @@
-package undercurrent.server;
+package undercurrentcore.server;
 
 import com.google.common.base.Throwables;
 import com.google.gson.JsonElement;

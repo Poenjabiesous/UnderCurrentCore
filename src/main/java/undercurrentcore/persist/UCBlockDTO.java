@@ -1,6 +1,6 @@
-package undercurrent.persist;
+package undercurrentcore.persist;
 
-import api.undercurrent.iface.UCTile;
+import api.undercurrent.iface.IUCTile;
 import net.minecraftforge.common.DimensionManager;
 
 /**
@@ -48,10 +48,21 @@ public class UCBlockDTO {
         return internalName;
     }
 
-    public UCTile getInstance() {
-        if (DimensionManager.getWorld(getDim()).getTileEntity(getxCoord(), getyCoord(), getzCoord()) instanceof UCTile) {
-            return (UCTile) DimensionManager.getWorld(getDim()).getTileEntity(getxCoord(), getyCoord(), getzCoord());
+    public IUCTile getInstance() {
+        if (DimensionManager.getWorld(getDim()).getTileEntity(getxCoord(), getyCoord(), getzCoord()) instanceof IUCTile) {
+            return (IUCTile) DimensionManager.getWorld(getDim()).getTileEntity(getxCoord(), getyCoord(), getzCoord());
         }
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return "UCBlock{" +
+                "xCoord=" + xCoord +
+                ", yCoord=" + yCoord +
+                ", zCoord=" + zCoord +
+                ", dim=" + dim +
+                ", internalName='" + internalName + '\'' +
+                '}';
     }
 }

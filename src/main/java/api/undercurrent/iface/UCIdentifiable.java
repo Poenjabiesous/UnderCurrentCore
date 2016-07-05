@@ -2,14 +2,14 @@ package api.undercurrent.iface;
 
 import net.minecraft.tileentity.TileEntity;
 
-public class IUCIdentifiable {
+public class UCIdentifiable {
 
     private int x;
     private int y;
     private int z;
     private int dim;
 
-    public IUCIdentifiable(TileEntity te) {
+    public UCIdentifiable(TileEntity te) {
         this.x = te.xCoord;
         this.y = te.yCoord;
         this.z = te.zCoord;

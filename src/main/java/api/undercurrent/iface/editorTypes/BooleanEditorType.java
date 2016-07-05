@@ -5,11 +5,6 @@ package api.undercurrent.iface.editorTypes;
  */
 public class BooleanEditorType extends EditorType {
 
-    public String fieldName;
-    public String displayName;
-    public String displayDescription;
-    public boolean fieldValue;
-
     public BooleanEditorType(String fieldName, String displayName, String displayDescription, boolean fieldValue) throws Exception {
         super(EditorTypes.BOOLEAN);
         this.fieldName = fieldName;
@@ -32,7 +27,7 @@ public class BooleanEditorType extends EditorType {
     }
 
     public boolean isFieldValue() {
-        return fieldValue;
+        return (Boolean) fieldValue;
     }
 
     @Override

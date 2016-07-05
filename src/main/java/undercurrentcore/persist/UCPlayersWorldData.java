@@ -1,10 +1,9 @@
-package undercurrent.persist;
+package undercurrentcore.persist;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.WorldSavedData;
 import net.minecraftforge.common.util.Constants;
-import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.ArrayList;
 

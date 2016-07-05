@@ -5,7 +5,11 @@ package api.undercurrent.iface.editorTypes;
  */
 public abstract class EditorType {
 
-    public EditorTypes editorType;
+    protected EditorTypes editorType;
+    protected String fieldName;
+    protected String displayName;
+    protected String displayDescription;
+    protected Object fieldValue;
 
     public EditorType(EditorTypes editorType) {
         this.editorType = editorType;

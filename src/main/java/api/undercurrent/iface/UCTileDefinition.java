@@ -4,7 +4,7 @@ import net.minecraft.tileentity.TileEntity;
 
 import java.util.ArrayList;
 
-public class UCTileDefinition extends IUCIdentifiable {
+public class UCTileDefinition extends UCIdentifiable {
 
     ArrayList<UCCollection> collections;
 

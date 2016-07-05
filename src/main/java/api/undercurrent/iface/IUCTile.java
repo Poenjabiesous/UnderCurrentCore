@@ -1,6 +1,6 @@
 package api.undercurrent.iface;
 
-public interface UCTile {
+public interface IUCTile {
 
     UCTileDefinition getTileDefinition() throws Exception;
 

@@ -7,11 +7,7 @@ import java.util.List;
  */
 public class ComboBoxEditorType extends EditorType {
 
-    public String fieldName;
-    public String fieldValue;
-    public String displayName;
-    public String displayDescription;
-    public List<String> comboChoices;
+    private List<String> comboChoices;
 
     public ComboBoxEditorType(String fieldName, String fieldValue, String displayName, String displayDescription, List<String> comboChoices) throws Exception {
         super(EditorTypes.COMBO);
@@ -28,7 +24,7 @@ public class ComboBoxEditorType extends EditorType {
     }
 
     public String getFieldValue() {
-        return fieldValue;
+        return (String) fieldValue;
     }
 
     public String getDisplayName() {

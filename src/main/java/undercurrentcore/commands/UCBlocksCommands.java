@@ -1,14 +1,14 @@
-package undercurrent.commands;
+package undercurrentcore.commands;
 
-import api.undercurrent.iface.UCTile;
+import api.undercurrent.iface.IUCTile;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.common.DimensionManager;
-import undercurrent.persist.UCBlockDTO;
-import undercurrent.persist.UCPlayersWorldData;
+import undercurrentcore.persist.UCBlockDTO;
+import undercurrentcore.persist.UCPlayersWorldData;
 
 public class UCBlocksCommands extends CommandBase {
     @Override
@@ -37,7 +37,7 @@ public class UCBlocksCommands extends CommandBase {
 
                     if (data != null) {
                         int blocks = data.getUCPlayerInfo(player.getUniqueID().toString()).getBlocks().size();
-                        player.addChatComponentMessage(new ChatComponentText("UnderCurrent: You have " + blocks + " registered blocks that you can administer."));
+                        player.addChatComponentMessage(new ChatComponentText("UnderCurrentCore: You have " + blocks + " registered blocks that you can administer."));
                         return;
                     }
                 }
@@ -55,7 +55,7 @@ public class UCBlocksCommands extends CommandBase {
                                     + "Name: " + block.getName()));
                             return;
                         } else {
-                            sender.addChatMessage(new ChatComponentText("UnderCurrent: No block found for that index number."));
+                            sender.addChatMessage(new ChatComponentText("UnderCurrentCore: No block found for that index number."));
                             return;
                         }
                     }
@@ -64,7 +64,7 @@ public class UCBlocksCommands extends CommandBase {
                 if (params[0].equals("name") && params.length > 2) {
 
                     if (params[1].toString().length() < 8) {
-                        sender.addChatMessage(new ChatComponentText("UnderCurrent: A block's name must be at least 8 characters long."));
+                        sender.addChatMessage(new ChatComponentText("UnderCurrentCore: A block's name must be at least 8 characters long."));
                         return;
                     }
 
@@ -74,24 +74,24 @@ public class UCBlocksCommands extends CommandBase {
                         MovingObjectPosition mop = player.rayTrace(5.0D, 1.0F);
 
                         if (mop != null && mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-                            if (player.worldObj.getTileEntity(mop.blockX, mop.blockY, mop.blockZ) instanceof UCTile) {
+                            if (player.worldObj.getTileEntity(mop.blockX, mop.blockY, mop.blockZ) instanceof IUCTile) {
                                 UCBlockDTO block = new UCBlockDTO(mop.blockX, mop.blockY, mop.blockZ, player.worldObj.provider.dimensionId, params[1].toString(), "");
                                 boolean updated = data.updateBlockName(player.getUniqueID().toString(), block);
                                 if (updated) {
-                                    sender.addChatMessage(new ChatComponentText("UnderCurrent: Block name updated."));
+                                    sender.addChatMessage(new ChatComponentText("UnderCurrentCore: Block name updated."));
                                     return;
                                 } else {
-                                    sender.addChatMessage(new ChatComponentText("UnderCurrent: You do not own that block."));
+                                    sender.addChatMessage(new ChatComponentText("UnderCurrentCore: You do not own that block."));
                                     return;
                                 }
 
                             } else {
-                                sender.addChatMessage(new ChatComponentText("UnderCurrent: You are not looking at an UnderCurrent applicable block."));
+                                sender.addChatMessage(new ChatComponentText("UnderCurrentCore: You are not looking at an UnderCurrentCore applicable block."));
                                 return;
                             }
 
                         } else {
-                            sender.addChatMessage(new ChatComponentText("UnderCurrent: You are not looking at an applicable block."));
+                            sender.addChatMessage(new ChatComponentText("UnderCurrentCore: You are not looking at an applicable block."));
                             return;
                         }
                     }

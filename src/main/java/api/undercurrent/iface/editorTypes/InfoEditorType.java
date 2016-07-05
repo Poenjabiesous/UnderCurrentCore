@@ -5,11 +5,6 @@ package api.undercurrent.iface.editorTypes;
  */
 public class InfoEditorType extends EditorType {
 
-    public String fieldName;
-    public String displayName;
-    public String displayDescription;
-    public String fieldValue;
-
     public InfoEditorType(String fieldName, String displayName, String displayDescription, String fieldValue) throws Exception {
         super(EditorTypes.INFO);
         this.fieldName = fieldName;
@@ -32,7 +27,7 @@ public class InfoEditorType extends EditorType {
     }
 
     public String getFieldValue() {
-        return fieldValue;
+        return (String) fieldValue;
     }
 
     @Override
