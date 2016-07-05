@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 @Mod(modid = ModInfo.ID, name = ModInfo.NAME, version = ModInfo.VERSION, acceptedMinecraftVersions = "1.7.10")
 public class UnderCurrent {
 
-    public static Logger logger = Logger.getLogger("UnderCurrent");
+    public static Logger logger = Logger.getLogger("UnderCurrentCore");
 
     @SidedProxy(clientSide = "undercurrent.proxy.ClientProxy", serverSide = "undercurrent.proxy.CommonProxy")
     public static CommonProxy proxy;

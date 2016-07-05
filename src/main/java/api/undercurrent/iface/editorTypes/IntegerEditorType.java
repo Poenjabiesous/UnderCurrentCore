@@ -49,11 +49,11 @@ public class IntegerEditorType extends EditorType {
     public void validateValue() throws Exception {
 
         if (getFieldValue() > getMaxValue()) {
-            throw new Exception("UnderCurrent: IntegerEditorType with fieldName " + getFieldName() + " has a value of " + getFieldValue() + ", and max defined value is " + getMaxValue() + ".");
+            throw new Exception("UnderCurrentBlocks: IntegerEditorType with fieldName " + getFieldName() + " has a value of " + getFieldValue() + ", and max defined value is " + getMaxValue() + ".");
         }
 
         if (getFieldValue() < getMinValue()) {
-            throw new Exception("UnderCurrent: IntegerEditorType with fieldName " + getFieldName() + " has a value of " + getFieldValue() + ", and min defined value is " + getMinValue() + ".");
+            throw new Exception("UnderCurrentBlocks: IntegerEditorType with fieldName " + getFieldName() + " has a value of " + getFieldValue() + ", and min defined value is " + getMinValue() + ".");
         }
 
     }

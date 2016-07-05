@@ -1,7 +1,7 @@
 package api.undercurrent.iface;
-/**
- * Created by Niel on 10/21/2015.
- */
+
+import net.minecraft.tileentity.TileEntity;
+
 public class IUCIdentifiable {
 
     private int x;
@@ -9,7 +9,7 @@ public class IUCIdentifiable {
     private int z;
     private int dim;
 
-    public IUCIdentifiable(UCTileEntity te) {
+    public IUCIdentifiable(TileEntity te) {
         this.x = te.xCoord;
         this.y = te.yCoord;
         this.z = te.zCoord;

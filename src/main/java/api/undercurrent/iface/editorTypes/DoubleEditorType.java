@@ -57,11 +57,11 @@ public class DoubleEditorType extends EditorType {
     public void validateValue() throws Exception {
 
         if (getFieldValue() > getMaxValue()) {
-            throw new Exception("UnderCurrent: DoubleEditorType with fieldName " + getFieldName() + " has a value of " + getFieldValue() + ", and max defined value is " + getMaxValue() + ".");
+            throw new Exception("UnderCurrentBlocks: DoubleEditorType with fieldName " + getFieldName() + " has a value of " + getFieldValue() + ", and max defined value is " + getMaxValue() + ".");
         }
 
         if (getFieldValue() < getMaxValue()) {
-            throw new Exception("UnderCurrent: DoubleEditorType with fieldName " + getFieldName() + " has a value of " + getFieldValue() + ", and min defined value is " + getMinValue() + ".");
+            throw new Exception("UnderCurrentBlocks: DoubleEditorType with fieldName " + getFieldName() + " has a value of " + getFieldValue() + ", and min defined value is " + getMinValue() + ".");
         }
     }
 

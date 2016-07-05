@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Created by Niel Verster on 5/26/2015.
@@ -25,13 +26,19 @@ import java.util.List;
 
 public class UCCoreImplServlet extends HttpServlet {
 
+    Gson gson;
+    public static Logger logger = Logger.getLogger("UnderCurrentCore");
+
+    public UCCoreImplServlet() {
+        gson = new Gson();
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         resp.setContentType("text/html;charset=utf-8");
         resp.setStatus(HttpServletResponse.SC_OK);
 
-        Gson gson = new Gson();
 
         String uuid = req.getParameter("uuid");
 
@@ -39,11 +46,24 @@ public class UCCoreImplServlet extends HttpServlet {
         if (uuid.equals("") || uuid.isEmpty()) {
             RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.EMPTY_REQUEST_PARAMETER.toString());
             resp.getWriter().write(gson.toJson(rro));
-            throw new ServletException("Cannot get all blocks for player due to: " + ResponseTypes.EMPTY_REQUEST_PARAMETER.toString());
+            return;
         }
 
         EntityPlayer player = lookupOwner(uuid);
+
+        if (player == null) {
+            RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.USER_NOT_FOUND.toString());
+            resp.getWriter().write(gson.toJson(rro));
+            return;
+        }
+
         UCPlayersWorldData data = (UCPlayersWorldData) player.worldObj.perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
+
+        if (!data.checkPlayer(uuid)) {
+            RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.USER_NOT_REGISTERED.toString());
+            resp.getWriter().write(gson.toJson(rro));
+            return;
+        }
 
         JsonArray array = new JsonArray();
         List<UCBlockDTO> blocks = data.getUCPlayerInfo(uuid).getBlocks();
@@ -54,7 +74,7 @@ public class UCCoreImplServlet extends HttpServlet {
             RequestReturnObject rro = new RequestReturnObject(true, array);
             resp.getWriter().write(gson.toJson(rro));
         } catch (Exception e) {
-            RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.SERVER_ERROR.toString() + ":" + Throwables.getStackTraceAsString(e));
+            RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.SERVER_ERROR.toString());
             resp.getWriter().write(gson.toJson(rro));
         }
 

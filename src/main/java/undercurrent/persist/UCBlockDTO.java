@@ -13,13 +13,15 @@ public class UCBlockDTO {
     private int zCoord;
     private int dim;
     private String name;
+    private String internalName;
 
-    public UCBlockDTO(int xCoord, int yCoord, int zCoord, int dim, String name) {
+    public UCBlockDTO(int xCoord, int yCoord, int zCoord, int dim, String name, String internalName) {
         this.xCoord = xCoord;
         this.yCoord = yCoord;
         this.zCoord = zCoord;
         this.dim = dim;
         this.name = name;
+        this.internalName = internalName;
     }
 
     public int getxCoord() {
@@ -40,6 +42,10 @@ public class UCBlockDTO {
 
     public String getName() {
         return name;
+    }
+
+    public String getInternalName() {
+        return internalName;
     }
 
     public UCTileEntity getInstance() {

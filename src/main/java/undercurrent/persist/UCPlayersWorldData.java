@@ -41,7 +41,6 @@ public class UCPlayersWorldData extends WorldSavedData {
         }
         NBTTagCompound newPlayer = new NBTTagCompound();
         newPlayer.setString("uuid", uuid);
-        newPlayer.setString("secretKey", RandomStringUtils.randomAlphanumeric(10));
         NBTTagList blocks = new NBTTagList();
         newPlayer.setTag("blocks", blocks);
         data.appendTag(newPlayer);
@@ -71,6 +70,7 @@ public class UCPlayersWorldData extends WorldSavedData {
                 blockToBeAdded.setInteger("zCoord", newBlock.getzCoord());
                 blockToBeAdded.setInteger("dim", newBlock.getDim());
                 blockToBeAdded.setString("name", newBlock.getName());
+                blockToBeAdded.setString("internalName", newBlock.getInternalName());
                 player.getTagList("blocks", Constants.NBT.TAG_COMPOUND).appendTag(blockToBeAdded);
                 markDirty();
                 return true;
@@ -119,7 +119,24 @@ public class UCPlayersWorldData extends WorldSavedData {
                 if (block == null) {
                     return null;
                 }
-                return new UCBlockDTO(block.getInteger("xCoord"), block.getInteger("yCoord"), block.getInteger("zCoord"), block.getInteger("dim"), block.getString("name"));
+                return new UCBlockDTO(block.getInteger("xCoord"), block.getInteger("yCoord"), block.getInteger("zCoord"), block.getInteger("dim"), block.getString("name"), block.getString("internalName"));
+            }
+        }
+        return null;
+    }
+
+    public UCBlockDTO getBlockByInternalName(String uuid, String internalName) {
+        for (int i = 0; i < data.tagCount(); i++) {
+            NBTTagCompound player = data.getCompoundTagAt(i);
+            if (player.getString("uuid").equals(uuid)) ;
+            {
+                NBTTagList blocks = player.getTagList("blocks", Constants.NBT.TAG_COMPOUND);
+                for (int j = 0; j <= blocks.tagCount(); j++) {
+                    NBTTagCompound block = blocks.getCompoundTagAt(j);
+                    if (block.getString("internalName").equals(internalName)) {
+                        return new UCBlockDTO(block.getInteger("xCoord"), block.getInteger("yCoord"), block.getInteger("zCoord"), block.getInteger("dim"), block.getString("name"), block.getString("internalName"));
+                    }
+                }
             }
         }
         return null;
@@ -131,16 +148,9 @@ public class UCPlayersWorldData extends WorldSavedData {
             if (player.getString("uuid").equals(uuid)) ;
             {
                 NBTTagList blocks = player.getTagList("blocks", Constants.NBT.TAG_COMPOUND);
-
-                NBTTagCompound block = new NBTTagCompound();
-                block.setInteger("xCoord", newBlock.getxCoord());
-                block.setInteger("yCoord", newBlock.getyCoord());
-                block.setInteger("zCoord", newBlock.getzCoord());
-                block.setInteger("dim", newBlock.getDim());
-
                 for (int j = 0; j < blocks.tagCount(); j++) {
                     NBTTagCompound currentBlock = blocks.getCompoundTagAt(j);
-                    if (currentBlock.equals(block)) {
+                    if (currentBlock.getString("internalName").equals(newBlock.getInternalName())) {
                         currentBlock.setString("name", newBlock.getName());
                         return true;
                     }
@@ -162,7 +172,7 @@ public class UCPlayersWorldData extends WorldSavedData {
 
                 for (int j = 0; j < blocksNBT.tagCount(); j++) {
                     NBTTagCompound block = blocksNBT.getCompoundTagAt(j);
-                    UCBlockDTO newBlock = new UCBlockDTO(block.getInteger("xCoord"), block.getInteger("yCoord"), block.getInteger("zCoord"), block.getInteger("dim"), block.getString("name"));
+                    UCBlockDTO newBlock = new UCBlockDTO(block.getInteger("xCoord"), block.getInteger("yCoord"), block.getInteger("zCoord"), block.getInteger("dim"), block.getString("name"), block.getString("internalName"));
                     blocks.add(newBlock);
                 }
 

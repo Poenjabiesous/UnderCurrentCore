@@ -41,11 +41,11 @@ public class StringEditorType extends EditorType {
     public void validateValue() throws Exception {
 
         if (getFieldValue().length() > getMaxLength()) {
-            throw new Exception("UnderCurrent: StringEditorType with fieldName " + getFieldName() + " has a length of " + getFieldValue().length() + ", and max defined length is " + getMaxLength() + ".");
+            throw new Exception("UnderCurrentBlocks: StringEditorType with fieldName " + getFieldName() + " has a length of " + getFieldValue().length() + ", and max defined length is " + getMaxLength() + ".");
         }
 
         if (getFieldValue().length() < getMinLength()) {
-            throw new Exception("UnderCurrent: StringEditorType with fieldName " + getFieldName() + " has a length of " + getFieldValue().length() + ", and min defined length is " + getMinLength() + ".");
+            throw new Exception("UnderCurrentBlocks: StringEditorType with fieldName " + getFieldName() + " has a length of " + getFieldValue().length() + ", and min defined length is " + getMinLength() + ".");
         }
 
     }

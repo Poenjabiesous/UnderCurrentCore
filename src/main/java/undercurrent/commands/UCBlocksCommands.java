@@ -75,7 +75,7 @@ public class UCBlocksCommands extends CommandBase {
 
                         if (mop != null && mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
                             if (player.worldObj.getTileEntity(mop.blockX, mop.blockY, mop.blockZ) instanceof UCTileEntity) {
-                                UCBlockDTO block = new UCBlockDTO(mop.blockX, mop.blockY, mop.blockZ, player.worldObj.provider.dimensionId, params[1].toString());
+                                UCBlockDTO block = new UCBlockDTO(mop.blockX, mop.blockY, mop.blockZ, player.worldObj.provider.dimensionId, params[1].toString(), "");
                                 boolean updated = data.updateBlockName(player.getUniqueID().toString(), block);
                                 if (updated) {
                                     sender.addChatMessage(new ChatComponentText("UnderCurrent: Block name updated."));

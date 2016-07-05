@@ -7,6 +7,7 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.world.BlockEvent;
+import org.apache.commons.lang3.RandomStringUtils;
 import undercurrent.persist.UCBlockDTO;
 import undercurrent.persist.UCPlayersWorldData;
 
@@ -41,7 +42,7 @@ public class UCEventHandler {
             if (event.player instanceof EntityPlayer && event.placedBlock instanceof BlockContainer && ((BlockContainer) event.placedBlock).createNewTileEntity(event.player.worldObj, 0) instanceof UCTileEntity) {
                 UCPlayersWorldData data = (UCPlayersWorldData) event.player.worldObj.perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
 
-                boolean added = data.addBlockToPlayer(event.player.getUniqueID().toString(), new UCBlockDTO(event.x, event.y, event.z, event.player.worldObj.provider.dimensionId, "new" + event.block.getLocalizedName()));
+                boolean added = data.addBlockToPlayer(event.player.getUniqueID().toString(), new UCBlockDTO(event.x, event.y, event.z, event.player.worldObj.provider.dimensionId, "new" + event.block.getLocalizedName(), RandomStringUtils.randomAlphabetic(10)));
                 if (added) {
                     event.player.addChatComponentMessage(new ChatComponentText("UnderCurrent: Registered new block for you at: <" + event.x + "> <" + event.y + "> <" + event.z + "> World: " + event.player.worldObj.provider.getDimensionName()));
                 } else {
@@ -57,7 +58,7 @@ public class UCEventHandler {
         if (event.getPlayer() != null && !event.getPlayer().worldObj.isRemote) {
             if (event.getPlayer() instanceof EntityPlayer && event.block instanceof BlockContainer && ((BlockContainer) event.block).createNewTileEntity(event.getPlayer().worldObj, 0) instanceof UCTileEntity) {
                 UCPlayersWorldData data = (UCPlayersWorldData) event.getPlayer().worldObj.perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
-                boolean removed = data.removeBlockFromPlayer(event.getPlayer().getUniqueID().toString(), new UCBlockDTO(event.x, event.y, event.z, event.getPlayer().worldObj.provider.dimensionId, ""));
+                boolean removed = data.removeBlockFromPlayer(event.getPlayer().getUniqueID().toString(), new UCBlockDTO(event.x, event.y, event.z, event.getPlayer().worldObj.provider.dimensionId, "", ""));
                 if (removed) {
                     event.getPlayer().addChatComponentMessage(new ChatComponentText("UnderCurrent: Unregistered UnderCurrent block at: <" + event.x + "> <" + event.y + "> <" + event.z + "> World: " + event.getPlayer().worldObj.provider.getDimensionName()));
                 } else {
