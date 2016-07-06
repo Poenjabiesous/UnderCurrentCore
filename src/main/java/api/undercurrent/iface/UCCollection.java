@@ -5,11 +5,11 @@ import java.util.ArrayList;
 
 public class UCCollection {
 
-    private String name;
+    private String collectionName;
     private ArrayList<EditorType> editableFields;
 
     public UCCollection(String name) {
-        this.name = name;
+        this.collectionName = name;
         editableFields = new ArrayList<EditorType>();
     }
 
@@ -17,7 +17,7 @@ public class UCCollection {
         return editableFields;
     }
 
-    public String getName() {
-        return name;
+    public String getCollectionName() {
+        return collectionName;
     }
 }

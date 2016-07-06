@@ -42,7 +42,7 @@ public class UCEventHandler {
             if (event.player instanceof EntityPlayer && event.placedBlock instanceof BlockContainer && ((BlockContainer) event.placedBlock).createNewTileEntity(event.player.worldObj, 0) instanceof IUCTile) {
                 UCPlayersWorldData data = (UCPlayersWorldData) event.player.worldObj.perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
 
-                boolean added = data.addBlockToPlayer(event.player.getUniqueID().toString(), new UCBlockDTO(event.x, event.y, event.z, event.player.worldObj.provider.dimensionId, "new" + event.block.getLocalizedName(), RandomStringUtils.randomAlphabetic(10)));
+                boolean added = data.addBlockToPlayer(event.player.getUniqueID().toString(), new UCBlockDTO(event.x, event.y, event.z, event.player.worldObj.provider.dimensionId, "new_" + event.block.getLocalizedName(), RandomStringUtils.randomAlphabetic(10)));
                 if (added) {
                     event.player.addChatComponentMessage(new ChatComponentText("UnderCurrentCore: Registered new block for you at: <" + event.x + "> <" + event.y + "> <" + event.z + "> World: " + event.player.worldObj.provider.getDimensionName()));
                 } else {

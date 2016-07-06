@@ -64,13 +64,25 @@ public class UCCoreImplServlet extends HttpServlet {
             return;
         }
 
-        JsonArray array = new JsonArray();
+
         List<UCBlockDTO> blocks = data.getUCPlayerInfo(uuid).getBlocks();
+        JsonArray blocksToReturn = new JsonArray();
         try {
-            for (int i = 0; i < blocks.size(); i++) {
-                array.add(gson.toJsonTree(blocks.get(i).getInstance().getTileDefinition()));
+            for (UCBlockDTO block : blocks) {
+                JsonObject blockObject = new JsonObject();
+                JsonArray editableFields = new JsonArray();
+                blockObject.addProperty("internalName", block.getInternalName());
+                blockObject.addProperty("name", block.getName());
+                blockObject.addProperty("xCoord", block.getxCoord());
+                blockObject.addProperty("yCoord", block.getyCoord());
+                blockObject.addProperty("zCoord", block.getzCoord());
+                blockObject.addProperty("dim", block.getDim());
+                blockObject.addProperty("dimName", DimensionManager.getProvider(block.getDim()).getDimensionName());
+                editableFields.add(gson.toJsonTree(block.getInstance().getTileDefinition()));
+                blockObject.add("editableFields", editableFields);
+                blocksToReturn.add(blockObject);
             }
-            RequestReturnObject rro = new RequestReturnObject(true, array);
+            RequestReturnObject rro = new RequestReturnObject(true, blocksToReturn);
             resp.getWriter().write(gson.toJson(rro));
         } catch (Exception e) {
             RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.SERVER_ERROR.toString());
@@ -122,6 +134,13 @@ public class UCCoreImplServlet extends HttpServlet {
             JsonObject objectIteratable = data.get(i).getAsJsonObject();
 
             UCBlockDTO blockToUpdate = playerData.getBlockByInternalName(uuid, objectIteratable.get("internalName").getAsString());
+
+            if (blockToUpdate == null) {
+                RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.NO_BLOCK_FOUND_FOR_INTERNAL_NAME.toString());
+                resp.getWriter().write(gson.toJson(rro));
+                return;
+            }
+
             JsonObject swapper = new JsonObject();
             TileEntity te = DimensionManager.getWorld(blockToUpdate.getDim()).getTileEntity(blockToUpdate.getxCoord(), blockToUpdate.getyCoord(), blockToUpdate.getzCoord());
 
@@ -152,7 +171,7 @@ public class UCCoreImplServlet extends HttpServlet {
             try {
                 te.getWorldObj().setTileEntity(blockToUpdate.getxCoord(), blockToUpdate.getyCoord(), blockToUpdate.getzCoord(), gson.fromJson(swapper, te.getClass()));
             } catch (Exception e) {
-                RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.CANT_USE_FIELD.toString());
+                RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.CANT_DO_TE_SWOP.toString());
                 resp.getWriter().write(gson.toJson(rro));
                 logger.severe("UnderCurrentCore: Problem swapping TE due to: " + Throwables.getStackTraceAsString(e));
                 return;

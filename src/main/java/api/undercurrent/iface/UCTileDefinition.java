@@ -4,12 +4,11 @@ import net.minecraft.tileentity.TileEntity;
 
 import java.util.ArrayList;
 
-public class UCTileDefinition extends UCIdentifiable {
+public class UCTileDefinition  {
 
     ArrayList<UCCollection> collections;
 
-    public UCTileDefinition(TileEntity te) {
-        super(te);
+    public UCTileDefinition() {
         collections = new ArrayList<UCCollection>();
     }
 
