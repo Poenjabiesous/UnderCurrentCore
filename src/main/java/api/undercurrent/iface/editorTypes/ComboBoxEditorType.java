@@ -16,7 +16,6 @@ public class ComboBoxEditorType extends EditorType {
         this.displayName = displayName;
         this.displayDescription = displayDescription;
         this.comboChoices = comboChoices;
-        validateValue();
     }
 
     public String getFieldName() {
@@ -40,7 +39,12 @@ public class ComboBoxEditorType extends EditorType {
     }
 
     @Override
-    public void validateValue() throws Exception {
+    public boolean validateValue(Object obj) throws Exception {
+        if(comboChoices.contains(obj))
+        {
+            return true;
+        }
+        return false;
     }
 
 }

@@ -11,7 +11,6 @@ public class InfoEditorType extends EditorType {
         this.displayName = displayName;
         this.displayDescription = displayDescription;
         this.fieldValue = fieldValue;
-        validateValue();
     }
 
     public String getFieldName() {
@@ -31,8 +30,8 @@ public class InfoEditorType extends EditorType {
     }
 
     @Override
-    public void validateValue() throws Exception {
-
+    public boolean validateValue(Object obj) throws Exception {
+        return true;
     }
 }
 

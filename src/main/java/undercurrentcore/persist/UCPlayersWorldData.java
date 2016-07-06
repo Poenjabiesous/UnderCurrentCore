@@ -6,6 +6,7 @@ import net.minecraft.world.WorldSavedData;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 
 /**
@@ -15,6 +16,16 @@ public class UCPlayersWorldData extends WorldSavedData {
 
     private NBTTagList data = new NBTTagList();
     public static String GLOBAL_TAG = "undercurrentdata";
+    public static String REGISTERED_PLAYERS = "ucRegisteredPlayers";
+    public static String SECRET_KEY = "ucRegisteredPlayers";
+    public static String BLOCKS = "blocks";
+    public static String INTERNAL_NAME = "internalName";
+    public static String NAME = "name";
+    public static String X_COORD = "xCoord";
+    public static String Y_COORD = "yCoord";
+    public static String Z_COORD = "zCoord";
+    public static String DIM = "dim";
+    public static String UUID = "uuid";
 
     public UCPlayersWorldData(String tagName) {
         super(tagName);
@@ -22,35 +33,48 @@ public class UCPlayersWorldData extends WorldSavedData {
 
     @Override
     public void readFromNBT(NBTTagCompound compound) {
-        data = compound.getTagList("ucRegisteredPlayers", Constants.NBT.TAG_COMPOUND);
+        data = compound.getTagList(REGISTERED_PLAYERS, Constants.NBT.TAG_COMPOUND);
     }
 
     @Override
     public void writeToNBT(NBTTagCompound compound) {
-        compound.setTag("ucRegisteredPlayers", data);
+        compound.setTag(REGISTERED_PLAYERS, data);
     }
 
-    public boolean addPlayer(String uuid) {
+    public boolean addPlayer(String secretKey, UUID uuid) {
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
-            if (player.getString("uuid").equals(uuid)) ;
+            if (player.getString(UUID).equals(uuid.toString())) ;
             {
                 return false;
             }
         }
+
         NBTTagCompound newPlayer = new NBTTagCompound();
-        newPlayer.setString("uuid", uuid);
+        newPlayer.setString(UUID, uuid.toString());
+        newPlayer.setString(SECRET_KEY, secretKey);
         NBTTagList blocks = new NBTTagList();
-        newPlayer.setTag("blocks", blocks);
+        newPlayer.setTag(BLOCKS, blocks);
         data.appendTag(newPlayer);
         markDirty();
         return true;
     }
 
-    public boolean checkPlayer(String uuid) {
+    public String getPlayerSecretKey(UUID uuid) {
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
-            if (player.getString("uuid").equals(uuid)) ;
+            if (player.getString(UUID).equals(uuid.toString())) ;
+            {
+                return player.getString(SECRET_KEY);
+            }
+        }
+        return null;
+    }
+
+    public boolean checkPlayerOnUUID(UUID uuid) {
+        for (int i = 0; i < data.tagCount(); i++) {
+            NBTTagCompound player = data.getCompoundTagAt(i);
+            if (player.getString(UUID).equals(uuid)) ;
             {
                 return true;
             }
@@ -58,19 +82,30 @@ public class UCPlayersWorldData extends WorldSavedData {
         return false;
     }
 
-    public boolean addBlockToPlayer(String uuid, UCBlockDTO newBlock) {
+    public boolean checkPlayerOnSecretKey(String secretKey) {
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
-            if (player.getString("uuid").equals(uuid)) ;
+            if (player.getString(SECRET_KEY).equals(secretKey)) ;
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean addBlockToPlayer(String secretKey, UCBlockDTO newBlock) {
+        for (int i = 0; i < data.tagCount(); i++) {
+            NBTTagCompound player = data.getCompoundTagAt(i);
+            if (player.getString(SECRET_KEY).equals(secretKey)) ;
             {
                 NBTTagCompound blockToBeAdded = new NBTTagCompound();
-                blockToBeAdded.setInteger("xCoord", newBlock.getxCoord());
-                blockToBeAdded.setInteger("yCoord", newBlock.getyCoord());
-                blockToBeAdded.setInteger("zCoord", newBlock.getzCoord());
-                blockToBeAdded.setInteger("dim", newBlock.getDim());
-                blockToBeAdded.setString("name", newBlock.getName());
-                blockToBeAdded.setString("internalName", newBlock.getInternalName());
-                player.getTagList("blocks", Constants.NBT.TAG_COMPOUND).appendTag(blockToBeAdded);
+                blockToBeAdded.setInteger(X_COORD, newBlock.getxCoord());
+                blockToBeAdded.setInteger(Y_COORD, newBlock.getyCoord());
+                blockToBeAdded.setInteger(Z_COORD, newBlock.getzCoord());
+                blockToBeAdded.setInteger(DIM, newBlock.getDim());
+                blockToBeAdded.setString(NAME, newBlock.getName());
+                blockToBeAdded.setString(INTERNAL_NAME, newBlock.getInternalName());
+                player.getTagList(BLOCKS, Constants.NBT.TAG_COMPOUND).appendTag(blockToBeAdded);
                 markDirty();
                 return true;
             }
@@ -78,21 +113,20 @@ public class UCPlayersWorldData extends WorldSavedData {
         return false;
     }
 
-    public boolean removeBlockFromPlayer(String uuid, UCBlockDTO oldBlock) {
+    public boolean removeBlockFromPlayer(String secretKey, UCBlockDTO oldBlock) {
 
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
-            if (player.getString("uuid").equals(uuid)) ;
+            if (player.getString(SECRET_KEY).equals(secretKey)) ;
             {
-                NBTTagList blocks = player.getTagList("blocks", Constants.NBT.TAG_COMPOUND);
+                NBTTagList blocks = player.getTagList(BLOCKS, Constants.NBT.TAG_COMPOUND);
 
                 for (int j = 0; j < blocks.tagCount(); j++) {
-                    System.out.println("Iteration " + j);
                     NBTTagCompound currentBlock = blocks.getCompoundTagAt(j);
-                    if (currentBlock.getInteger("xCoord") == oldBlock.getxCoord()
-                            && currentBlock.getInteger("yCoord") == oldBlock.getyCoord()
-                            && currentBlock.getInteger("zCoord") == oldBlock.getzCoord()
-                            && currentBlock.getInteger("dim") == oldBlock.getDim()) {
+                    if (currentBlock.getInteger(X_COORD) == oldBlock.getxCoord()
+                            && currentBlock.getInteger(Y_COORD) == oldBlock.getyCoord()
+                            && currentBlock.getInteger(Z_COORD) == oldBlock.getzCoord()
+                            && currentBlock.getInteger(DIM) == oldBlock.getDim()) {
                         blocks.removeTag(j);
                         markDirty();
                         return true;
@@ -103,12 +137,12 @@ public class UCPlayersWorldData extends WorldSavedData {
         return false;
     }
 
-    public UCBlockDTO getBlockByIndex(String uuid, int index) {
+    public UCBlockDTO getBlockByIndex(String secretKey, int index) {
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
-            if (player.getString("uuid").equals(uuid)) ;
+            if (player.getString(SECRET_KEY).equals(secretKey)) ;
             {
-                NBTTagList blocks = player.getTagList("blocks", Constants.NBT.TAG_COMPOUND);
+                NBTTagList blocks = player.getTagList(BLOCKS, Constants.NBT.TAG_COMPOUND);
 
                 if (index + 1 > blocks.tagCount() || index + 1 <= 0) {
                     return null;
@@ -118,22 +152,22 @@ public class UCPlayersWorldData extends WorldSavedData {
                 if (block == null) {
                     return null;
                 }
-                return new UCBlockDTO(block.getInteger("xCoord"), block.getInteger("yCoord"), block.getInteger("zCoord"), block.getInteger("dim"), block.getString("name"), block.getString("internalName"));
+                return new UCBlockDTO(block.getInteger(X_COORD), block.getInteger(Y_COORD), block.getInteger(Z_COORD), block.getInteger(DIM), block.getString(NAME), block.getString(INTERNAL_NAME));
             }
         }
         return null;
     }
 
-    public UCBlockDTO getBlockByInternalName(String uuid, String internalName) {
+    public UCBlockDTO getBlockByInternalName(String secretKey, String internalName) {
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
-            if (player.getString("uuid").equals(uuid)) ;
+            if (player.getString(SECRET_KEY).equals(secretKey)) ;
             {
-                NBTTagList blocks = player.getTagList("blocks", Constants.NBT.TAG_COMPOUND);
+                NBTTagList blocks = player.getTagList(BLOCKS, Constants.NBT.TAG_COMPOUND);
                 for (int j = 0; j <= blocks.tagCount(); j++) {
                     NBTTagCompound block = blocks.getCompoundTagAt(j);
-                    if (block.getString("internalName").equals(internalName)) {
-                        return new UCBlockDTO(block.getInteger("xCoord"), block.getInteger("yCoord"), block.getInteger("zCoord"), block.getInteger("dim"), block.getString("name"), block.getString("internalName"));
+                    if (block.getString(INTERNAL_NAME).equals(internalName)) {
+                        return new UCBlockDTO(block.getInteger(X_COORD), block.getInteger(Y_COORD), block.getInteger(Z_COORD), block.getInteger(DIM), block.getString(NAME), block.getString(INTERNAL_NAME));
                     }
                 }
             }
@@ -141,16 +175,16 @@ public class UCPlayersWorldData extends WorldSavedData {
         return null;
     }
 
-    public boolean updateBlockName(String uuid, UCBlockDTO newBlock) {
+    public boolean updateBlockName(String secretKey, UCBlockDTO newBlock) {
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
-            if (player.getString("uuid").equals(uuid)) ;
+            if (player.getString(SECRET_KEY).equals(secretKey)) ;
             {
-                NBTTagList blocks = player.getTagList("blocks", Constants.NBT.TAG_COMPOUND);
+                NBTTagList blocks = player.getTagList(BLOCKS, Constants.NBT.TAG_COMPOUND);
                 for (int j = 0; j < blocks.tagCount(); j++) {
                     NBTTagCompound currentBlock = blocks.getCompoundTagAt(j);
-                    if (currentBlock.getString("internalName").equals(newBlock.getInternalName())) {
-                        currentBlock.setString("name", newBlock.getName());
+                    if (currentBlock.getString(INTERNAL_NAME).equals(newBlock.getInternalName())) {
+                        currentBlock.setString(NAME, newBlock.getName());
                         return true;
                     }
                 }
@@ -159,10 +193,10 @@ public class UCPlayersWorldData extends WorldSavedData {
         return false;
     }
 
-    public UCPlayerDTO getUCPlayerInfo(String uuid) {
+    public UCPlayerDTO getUCPlayerInfo(String secretKey) {
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
-            if (player.getString("uuid").equals(uuid)) {
+            if (player.getString(SECRET_KEY).equals(secretKey)) {
                 UCPlayerDTO UCPlayerDTO = new UCPlayerDTO();
                 UCPlayerDTO.setUuid(player.getString("uuid"));
 
@@ -171,7 +205,7 @@ public class UCPlayersWorldData extends WorldSavedData {
 
                 for (int j = 0; j < blocksNBT.tagCount(); j++) {
                     NBTTagCompound block = blocksNBT.getCompoundTagAt(j);
-                    UCBlockDTO newBlock = new UCBlockDTO(block.getInteger("xCoord"), block.getInteger("yCoord"), block.getInteger("zCoord"), block.getInteger("dim"), block.getString("name"), block.getString("internalName"));
+                    UCBlockDTO newBlock = new UCBlockDTO(block.getInteger(X_COORD), block.getInteger(Y_COORD), block.getInteger(Z_COORD), block.getInteger(DIM), block.getString(NAME), block.getString(INTERNAL_NAME));
                     blocks.add(newBlock);
                 }
 

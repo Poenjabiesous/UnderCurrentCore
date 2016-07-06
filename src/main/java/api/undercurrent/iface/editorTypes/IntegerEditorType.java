@@ -21,7 +21,7 @@ public class IntegerEditorType extends EditorType {
         return fieldName;
     }
 
-    public int getFieldValue() {
+    public Object getFieldValue() {
         return (Integer) fieldValue;
     }
 
@@ -42,15 +42,21 @@ public class IntegerEditorType extends EditorType {
     }
 
     @Override
-    public void validateValue() throws Exception {
+    public boolean validateValue(Object obj) throws Exception {
+        try {
+            double objcast = Integer.valueOf(String.valueOf(obj));
 
-        if (getFieldValue() > getMaxValue()) {
-            throw new Exception("UnderCurrentBlocks: IntegerEditorType with fieldName " + getFieldName() + " has a value of " + getFieldValue() + ", and max defined value is " + getMaxValue() + ".");
+            if (objcast > getMaxValue()) {
+                return false;
+            }
+
+            if (objcast < getMinValue()) {
+                return false;
+            }
+            return true;
+
+        } catch (Exception e) {
+            return false;
         }
-
-        if (getFieldValue() < getMinValue()) {
-            throw new Exception("UnderCurrentBlocks: IntegerEditorType with fieldName " + getFieldName() + " has a value of " + getFieldValue() + ", and min defined value is " + getMinValue() + ".");
-        }
-
     }
 }

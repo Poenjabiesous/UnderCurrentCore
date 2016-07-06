@@ -18,14 +18,13 @@ public class DoubleEditorType extends EditorType {
         this.fieldPrecision = fieldPrecision;
         this.maxValue = maxValue;
         this.minValue = minValue;
-        validateValue();
     }
 
     public String getFieldName() {
         return fieldName;
     }
 
-    public double getFieldValue() {
+    public Object getFieldValue() {
         return (Double) fieldValue;
     }
 
@@ -50,14 +49,21 @@ public class DoubleEditorType extends EditorType {
     }
 
     @Override
-    public void validateValue() throws Exception {
+    public boolean validateValue(Object obj) throws Exception {
+        try {
+            double objcast = Double.valueOf(String.valueOf(obj));
 
-        if (getFieldValue() > getMaxValue()) {
-            throw new Exception("UnderCurrentBlocks: DoubleEditorType with fieldName " + getFieldName() + " has a value of " + getFieldValue() + ", and max defined value is " + getMaxValue() + ".");
-        }
+            if (objcast > getMaxValue()) {
+                return false;
+            }
 
-        if (getFieldValue() < getMaxValue()) {
-            throw new Exception("UnderCurrentBlocks: DoubleEditorType with fieldName " + getFieldName() + " has a value of " + getFieldValue() + ", and min defined value is " + getMinValue() + ".");
+            if (objcast < getMinValue()) {
+                return false;
+            }
+            return true;
+
+        } catch (Exception e) {
+            return false;
         }
     }
 

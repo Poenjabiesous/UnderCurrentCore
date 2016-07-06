@@ -1,4 +1,5 @@
 package api.undercurrent.iface.editorTypes;
+
 /**
  * Created by Niel on 10/16/2015.
  */
@@ -34,15 +35,23 @@ public class StringEditorType extends EditorType {
     }
 
     @Override
-    public void validateValue() throws Exception {
+    public boolean validateValue(Object obj) throws Exception {
 
-        if (getFieldValue().length() > getMaxLength()) {
-            throw new Exception("UnderCurrentBlocks: StringEditorType with fieldName " + getFieldName() + " has a length of " + getFieldValue().length() + ", and max defined length is " + getMaxLength() + ".");
+        try {
+            String objcast = String.valueOf(obj);
+
+            if (objcast.length() > getMaxLength()) {
+                return false;
+            }
+
+            if (objcast.length() < getMinLength()) {
+                return false;
+            }
+
+            return true;
+
+        } catch (Exception e) {
+            return false;
         }
-
-        if (getFieldValue().length() < getMinLength()) {
-            throw new Exception("UnderCurrentBlocks: StringEditorType with fieldName " + getFieldName() + " has a length of " + getFieldValue().length() + ", and min defined length is " + getMinLength() + ".");
-        }
-
     }
 }

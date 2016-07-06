@@ -5,19 +5,38 @@ package api.undercurrent.iface.editorTypes;
  */
 public abstract class EditorType {
 
-    protected EditorTypes editorType;
-    protected String fieldName;
-    protected String displayName;
-    protected String displayDescription;
-    protected Object fieldValue;
+    public EditorTypes editorType;
+    public String fieldName;
+    public String displayName;
+    public String displayDescription;
+    public Object fieldValue;
 
     public EditorType(EditorTypes editorType) {
         this.editorType = editorType;
     }
 
-    public abstract void validateValue() throws Exception;
+    public abstract boolean validateValue(Object obj) throws Exception;
+
+    public abstract Object getFieldValue();
 
     public enum EditorTypes {
         STRING, INT, DOUBLE, BOOLEAN, INFO, COMBO
     }
+
+    public EditorTypes getEditorType() {
+        return editorType;
+    }
+
+    public String getFieldName() {
+        return fieldName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public String getDisplayDescription() {
+        return displayDescription;
+    }
+
 }

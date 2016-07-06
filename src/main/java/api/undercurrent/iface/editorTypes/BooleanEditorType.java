@@ -11,7 +11,6 @@ public class BooleanEditorType extends EditorType {
         this.displayName = displayName;
         this.displayDescription = displayDescription;
         this.fieldValue = fieldValue;
-        validateValue();
     }
 
     public String getFieldName() {
@@ -26,12 +25,22 @@ public class BooleanEditorType extends EditorType {
         return displayDescription;
     }
 
-    public boolean isFieldValue() {
+    public Object getFieldValue() {
         return (Boolean) fieldValue;
     }
 
     @Override
-    public void validateValue() throws Exception {
+    public boolean validateValue(Object obj) throws Exception {
+
+        try {
+
+            boolean objcast = Boolean.valueOf(String.valueOf(obj));
+            return true;
+
+        } catch (Exception e) {
+            return false;
+        }
+
 
     }
 }

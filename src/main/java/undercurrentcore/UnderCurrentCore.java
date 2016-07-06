@@ -5,7 +5,8 @@ import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
-import undercurrentcore.commands.UCBlocksCommands;
+import undercurrentcore.commands.UCCommandLink;
+import undercurrentcore.commands.UCCommandName;
 import undercurrentcore.proxy.CommonProxy;
 import undercurrentcore.reference.ModInfo;
 import undercurrentcore.server.ServerWrapper;
@@ -37,7 +38,8 @@ public class UnderCurrentCore {
         logger.info("UnderCurrentCore: Starting Server.");
         ServerWrapper.startUCServer();
         System.out.println("UnderCurrentCore: Registering commands.");
-        event.registerServerCommand(new UCBlocksCommands());
+        event.registerServerCommand(new UCCommandName());
+        event.registerServerCommand(new UCCommandLink());
     }
 
     @EventHandler
