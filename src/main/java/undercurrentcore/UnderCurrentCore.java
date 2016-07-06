@@ -7,6 +7,7 @@ import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
 import undercurrentcore.commands.UCCommandLink;
 import undercurrentcore.commands.UCCommandName;
+import undercurrentcore.persist.UCConfiguration;
 import undercurrentcore.proxy.CommonProxy;
 import undercurrentcore.reference.ModInfo;
 import undercurrentcore.server.ServerWrapper;
@@ -24,6 +25,12 @@ public class UnderCurrentCore {
 
     @Instance(ModInfo.ID)
     public static UnderCurrentCore instance;
+
+    @EventHandler
+    public void preInit(FMLPreInitializationEvent event) {
+        System.out.println("UnderCurrentCore: Reading configuration. ");
+        UCConfiguration.init(event.getSuggestedConfigurationFile());
+    }
 
     @EventHandler
     public void init(FMLInitializationEvent event) {

@@ -4,6 +4,7 @@ import org.eclipse.jetty.server.Server;
 
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import undercurrentcore.persist.UCConfiguration;
 import undercurrentcore.server.servletHandlers.UCCoreImplServlet;
 
 /**
@@ -11,7 +12,7 @@ import undercurrentcore.server.servletHandlers.UCCoreImplServlet;
  */
 public class ServerWrapper {
 
-    private static Server server = new Server(777);
+    private static Server server = new Server(UCConfiguration.getServerAPIPort());
 
     public static void startUCServer() {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
