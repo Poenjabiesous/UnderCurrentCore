@@ -64,7 +64,7 @@ public class UCCoreImplServlet extends HttpServlet {
         List<UCBlockDTO> blocks = data.getUCPlayerInfo(secretKey).getBlocks();
 
         if (blocks == null) {
-            RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.USER_NOT_REGISTERED.toString());
+            RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.CANT_RETRIEVE_USER_INFO.toString());
             resp.getWriter().write(gson.toJson(rro));
             return;
         }
@@ -82,15 +82,15 @@ public class UCCoreImplServlet extends HttpServlet {
                 blockObject.addProperty("dim", block.getDim());
                 blockObject.addProperty("dimName", DimensionManager.getProvider(block.getDim()).getDimensionName());
                 editableFields.add(gson.toJsonTree(block.getInstance().getTileDefinition()));
-                blockObject.add("editedData", editableFields);
+                blockObject.add("editableFields", editableFields);
                 blocksToReturn.add(blockObject);
             }
             RequestReturnObject rro = new RequestReturnObject(true, blocksToReturn);
             resp.getWriter().write(gson.toJson(rro));
         } catch (Exception e) {
-            RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.SERVER_ERROR.toString());
+            RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.SERVER_ERROR.toString() + "::" + e.getMessage());
             resp.getWriter().write(gson.toJson(rro));
-            logger.severe("UnderCurrentCore: Problem while serializing block description objects due to: " + Throwables.getStackTraceAsString(e));
+            logger.severe(Throwables.getStackTraceAsString(e));
         }
 
     }
@@ -154,7 +154,6 @@ public class UCCoreImplServlet extends HttpServlet {
             if (te == null) {
                 RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.WORLD_TE_DOES_NOT_EXIST.toString());
                 resp.getWriter().write(gson.toJson(rro));
-                logger.severe("UnderCurrentCore: Problem locating TE while preparing for swapping. Object: " + blockToUpdate.toString());
                 return;
             }
 
@@ -229,7 +228,6 @@ public class UCCoreImplServlet extends HttpServlet {
                 } catch (Exception e) {
                     RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.CANT_USE_FIELD.toString() + ": " + currentIteration.get("fieldName").getAsString());
                     resp.getWriter().write(gson.toJson(rro));
-                    logger.severe("UnderCurrentCore: Problem adding field for swapping: " + currentIteration.get("fieldName").getAsString() + "::" + Throwables.getStackTraceAsString(e));
                     return;
                 }
             }
@@ -237,9 +235,8 @@ public class UCCoreImplServlet extends HttpServlet {
             try {
                 te.getWorldObj().setTileEntity(blockToUpdate.getxCoord(), blockToUpdate.getyCoord(), blockToUpdate.getzCoord(), gson.fromJson(swapper, te.getClass()));
             } catch (Exception e) {
-                RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.CANT_DO_TE_SWOP.toString());
+                RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.CANT_DO_TE_SWOP.toString() + "::" + e.getMessage());
                 resp.getWriter().write(gson.toJson(rro));
-                logger.severe("UnderCurrentCore: Problem swapping TE due to: " + Throwables.getStackTraceAsString(e));
                 return;
             }
         }

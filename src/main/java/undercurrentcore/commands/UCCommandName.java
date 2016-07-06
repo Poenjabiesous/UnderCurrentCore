@@ -5,8 +5,7 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.*;
 import net.minecraftforge.common.DimensionManager;
 import undercurrentcore.persist.UCBlockDTO;
 import undercurrentcore.persist.UCPlayersWorldData;
@@ -19,7 +18,7 @@ public class UCCommandName extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "ucname <name>";
+        return "/ucname <name>";
     }
 
 
@@ -40,7 +39,10 @@ public class UCCommandName extends CommandBase {
                 }
 
                 if (params[0].toString().length() < 4) {
-                    sender.addChatMessage(new ChatComponentText("UnderCurrentCore: A block's name must be at least 4 characters long."));
+                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA +
+                            "UnderCurrent: " +
+                            EnumChatFormatting.WHITE +
+                            StatCollector.translateToLocal("ucname.error.length")));
                     return;
                 }
 
@@ -48,7 +50,11 @@ public class UCCommandName extends CommandBase {
 
                 if (data != null) {
 
-                    MovingObjectPosition mop = player.rayTrace(5.0D, 1.0F);
+                    Vec3 vec3 = Vec3.createVectorHelper(player.posX, player.posY + (2 + (player.getEyeHeight() - player.getDefaultEyeHeight())), player.posZ);
+                    Vec3 vec3a = player.getLookVec();
+                    Vec3 vec3b = vec3.addVector(vec3a.xCoord * 5.0F, vec3a.yCoord * 5.0F, vec3a.zCoord * 5.0F);
+
+                    MovingObjectPosition mop = player.worldObj.rayTraceBlocks(vec3, vec3b);
 
                     if (mop != null && mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
                         if (player.worldObj.getTileEntity(mop.blockX, mop.blockY, mop.blockZ) instanceof IUCTile) {
@@ -56,25 +62,36 @@ public class UCCommandName extends CommandBase {
                             String secretKey = data.getPlayerSecretKey(player.getUniqueID());
 
                             if (secretKey == null) {
-                                sender.addChatMessage(new ChatComponentText("UnderCurrentCore: You are not registered."));
                                 return;
                             }
 
                             if (data.updateBlockName(secretKey, block)) {
-                                sender.addChatMessage(new ChatComponentText("UnderCurrentCore: Block name updated."));
+                                sender.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA +
+                                        "UnderCurrent: " +
+                                        EnumChatFormatting.WHITE +
+                                        StatCollector.translateToLocal("ucname.info")));
                                 return;
                             } else {
-                                sender.addChatMessage(new ChatComponentText("UnderCurrentCore: You do not own that block."));
+                                sender.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA +
+                                        "UnderCurrent: " +
+                                        EnumChatFormatting.WHITE +
+                                        StatCollector.translateToLocal("ucname.error.ownership")));
                                 return;
                             }
 
                         } else {
-                            sender.addChatMessage(new ChatComponentText("UnderCurrentCore: You are not looking at an UnderCurrentCore applicable block."));
+                            sender.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA +
+                                    "UnderCurrent: " +
+                                    EnumChatFormatting.WHITE +
+                                    StatCollector.translateToLocal("ucname.error.block")));
                             return;
                         }
 
                     } else {
-                        sender.addChatMessage(new ChatComponentText("UnderCurrentCore: You are not looking at a block."));
+                        sender.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA +
+                                "UnderCurrent: " +
+                                EnumChatFormatting.WHITE +
+                                StatCollector.translateToLocal("ucname.error.block")));
                         return;
                     }
                 }

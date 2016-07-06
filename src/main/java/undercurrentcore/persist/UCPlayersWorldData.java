@@ -44,7 +44,7 @@ public class UCPlayersWorldData extends WorldSavedData {
     public boolean addPlayer(String secretKey, UUID uuid) {
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
-            if (player.getString(UUID).equals(uuid.toString())) ;
+            if (player.getString(UUID).equals(uuid.toString()))
             {
                 return false;
             }
@@ -63,7 +63,7 @@ public class UCPlayersWorldData extends WorldSavedData {
     public String getPlayerSecretKey(UUID uuid) {
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
-            if (player.getString(UUID).equals(uuid.toString())) ;
+            if (player.getString(UUID).equals(uuid.toString()))
             {
                 return player.getString(SECRET_KEY);
             }
@@ -74,7 +74,7 @@ public class UCPlayersWorldData extends WorldSavedData {
     public boolean checkPlayerOnUUID(UUID uuid) {
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
-            if (player.getString(UUID).equals(uuid)) ;
+            if (player.getString(UUID).equals(uuid))
             {
                 return true;
             }
@@ -85,7 +85,7 @@ public class UCPlayersWorldData extends WorldSavedData {
     public boolean checkPlayerOnSecretKey(String secretKey) {
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
-            if (player.getString(SECRET_KEY).equals(secretKey)) ;
+            if (player.getString(SECRET_KEY).equals(secretKey))
             {
                 return true;
             }
@@ -96,7 +96,7 @@ public class UCPlayersWorldData extends WorldSavedData {
     public boolean addBlockToPlayer(String secretKey, UCBlockDTO newBlock) {
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
-            if (player.getString(SECRET_KEY).equals(secretKey)) ;
+            if (player.getString(SECRET_KEY).equals(secretKey))
             {
                 NBTTagCompound blockToBeAdded = new NBTTagCompound();
                 blockToBeAdded.setInteger(X_COORD, newBlock.getxCoord());
@@ -117,7 +117,7 @@ public class UCPlayersWorldData extends WorldSavedData {
 
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
-            if (player.getString(SECRET_KEY).equals(secretKey)) ;
+            if (player.getString(SECRET_KEY).equals(secretKey))
             {
                 NBTTagList blocks = player.getTagList(BLOCKS, Constants.NBT.TAG_COMPOUND);
 
@@ -140,7 +140,7 @@ public class UCPlayersWorldData extends WorldSavedData {
     public UCBlockDTO getBlockByIndex(String secretKey, int index) {
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
-            if (player.getString(SECRET_KEY).equals(secretKey)) ;
+            if (player.getString(SECRET_KEY).equals(secretKey))
             {
                 NBTTagList blocks = player.getTagList(BLOCKS, Constants.NBT.TAG_COMPOUND);
 
@@ -161,7 +161,7 @@ public class UCPlayersWorldData extends WorldSavedData {
     public UCBlockDTO getBlockByInternalName(String secretKey, String internalName) {
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
-            if (player.getString(SECRET_KEY).equals(secretKey)) ;
+            if (player.getString(SECRET_KEY).equals(secretKey))
             {
                 NBTTagList blocks = player.getTagList(BLOCKS, Constants.NBT.TAG_COMPOUND);
                 for (int j = 0; j <= blocks.tagCount(); j++) {
@@ -178,12 +178,15 @@ public class UCPlayersWorldData extends WorldSavedData {
     public boolean updateBlockName(String secretKey, UCBlockDTO newBlock) {
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
-            if (player.getString(SECRET_KEY).equals(secretKey)) ;
+            if (player.getString(SECRET_KEY).equals(secretKey))
             {
                 NBTTagList blocks = player.getTagList(BLOCKS, Constants.NBT.TAG_COMPOUND);
                 for (int j = 0; j < blocks.tagCount(); j++) {
                     NBTTagCompound currentBlock = blocks.getCompoundTagAt(j);
-                    if (currentBlock.getString(INTERNAL_NAME).equals(newBlock.getInternalName())) {
+                    if (currentBlock.getInteger(X_COORD) == newBlock.getxCoord()
+                            && currentBlock.getInteger(Y_COORD) == newBlock.getyCoord()
+                            && currentBlock.getInteger(Z_COORD) == newBlock.getzCoord()
+                            && currentBlock.getInteger(DIM) == newBlock.getDim()) {
                         currentBlock.setString(NAME, newBlock.getName());
                         return true;
                     }

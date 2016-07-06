@@ -5,6 +5,8 @@ import net.minecraft.block.BlockContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.StatCollector;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.world.BlockEvent;
@@ -22,23 +24,29 @@ public class UCEventHandler {
 
                 UCPlayersWorldData data = (UCPlayersWorldData) MinecraftServer.getServer().getEntityWorld().perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
 
+                if (data == null) {
+                    data = new UCPlayersWorldData(UCPlayersWorldData.GLOBAL_TAG);
+                    MinecraftServer.getServer().getEntityWorld().perWorldStorage.setData(UCPlayersWorldData.GLOBAL_TAG, data);
+                }
+
                 boolean registered = data.checkPlayerOnUUID(player.getUniqueID());
 
                 if (registered) {
-
                     String secretKey = data.getPlayerSecretKey(player.getUniqueID());
                     if (secretKey == null) {
+                        event.setCanceled(true);
                         return;
                     }
-
-                    player.addChatComponentMessage(new ChatComponentText("UnderCurrentCore: Already Registered. You have " + data.getUCPlayerInfo(secretKey).getBlocks().size() + " blocks that you can administer."));
-                    return;
                 }
 
                 boolean registration = data.addPlayer(RandomStringUtils.randomAlphanumeric(6), player.getUniqueID());
 
                 if (registration) {
-                    player.addChatComponentMessage(new ChatComponentText("UnderCurrentCore: Registration successful."));
+                    player.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.AQUA +
+                            "UnderCurrent: " +
+                            EnumChatFormatting.WHITE +
+                            StatCollector.translateToLocal("register.info")
+                    ));
                 }
             }
         }
@@ -53,17 +61,26 @@ public class UCEventHandler {
                 String secretKey = data.getPlayerSecretKey(event.player.getUniqueID());
 
                 if (secretKey == null) {
+                    event.setCanceled(true);
                     return;
                 }
 
                 boolean added = data.addBlockToPlayer(secretKey, new UCBlockDTO(event.x, event.y, event.z, event.player.worldObj.provider.dimensionId, "new_" + event.block.getLocalizedName(), RandomStringUtils.randomAlphabetic(10)));
                 if (added) {
-                    event.player.addChatComponentMessage(new ChatComponentText("UnderCurrentCore: Registered new block for you at: <" + event.x + "> <" + event.y + "> <" + event.z + "> World: " + event.player.worldObj.provider.getDimensionName()));
-                } else {
-                    event.player.addChatComponentMessage(new ChatComponentText("Cannot add a new UnderCurrentCore block to your profile. Please try to relog, and try again."));
-                    event.setCanceled(true);
+
+                    event.player.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.AQUA +
+                            "UnderCurrent: " +
+                            EnumChatFormatting.WHITE +
+                            StatCollector.translateToLocal("blockPlaced.info.1") +
+                            ": " +
+                            "<" + event.x + "> <" + event.y + "> <" + event.z + "> Dim: " + event.player.worldObj.provider.getDimensionName() +
+                            ". " +
+                            StatCollector.translateToLocal("blockPlaced.info.2")
+                    ));
                 }
             }
+        } else {
+            event.setCanceled(true);
         }
     }
 
@@ -76,17 +93,24 @@ public class UCEventHandler {
                 String secretKey = data.getPlayerSecretKey(event.getPlayer().getUniqueID());
 
                 if (secretKey == null) {
+                    event.setCanceled(true);
                     return;
                 }
 
                 boolean removed = data.removeBlockFromPlayer(secretKey, new UCBlockDTO(event.x, event.y, event.z, event.getPlayer().worldObj.provider.dimensionId, "", ""));
                 if (removed) {
-                    event.getPlayer().addChatComponentMessage(new ChatComponentText("UnderCurrentCore: Unregistered UnderCurrentCore block at: <" + event.x + "> <" + event.y + "> <" + event.z + "> World: " + event.getPlayer().worldObj.provider.getDimensionName()));
-                } else {
-                    event.getPlayer().addChatComponentMessage(new ChatComponentText("Cannot remove UnderCurrentCore block from your profile, it did not exist."));
-                    event.setCanceled(true);
+
+                    event.getPlayer().addChatComponentMessage(new ChatComponentText(EnumChatFormatting.AQUA +
+                            "UnderCurrent: " +
+                            EnumChatFormatting.WHITE +
+                            StatCollector.translateToLocal("blockBroken.info.1") +
+                            ": " +
+                            "<" + event.x + "> <" + event.y + "> <" + event.z + "> Dim: " + event.getPlayer().worldObj.provider.getDimensionName()
+                    ));
                 }
             }
+        } else {
+            event.setCanceled(true);
         }
     }
 }
