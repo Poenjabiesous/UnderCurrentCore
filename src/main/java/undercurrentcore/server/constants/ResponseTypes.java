@@ -5,7 +5,6 @@ package undercurrentcore.server.constants;
  */
 public enum ResponseTypes {
 
-    USER_NOT_FOUND,
     EMPTY_REQUEST_PARAMETER,
     SERVER_ERROR,
     WORLD_TE_DOES_NOT_EXIST,

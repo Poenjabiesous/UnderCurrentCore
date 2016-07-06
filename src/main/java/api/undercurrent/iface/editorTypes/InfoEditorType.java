@@ -31,7 +31,7 @@ public class InfoEditorType extends EditorType {
 
     @Override
     public boolean validateValue(Object obj) throws Exception {
-        return true;
+        return false;
     }
 }
 
