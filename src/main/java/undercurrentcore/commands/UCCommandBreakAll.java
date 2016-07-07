@@ -1,5 +1,6 @@
 package undercurrentcore.commands;
 
+import api.undercurrent.iface.IUCTile;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -41,7 +42,12 @@ public class UCCommandBreakAll extends CommandBase {
                 UCPlayerDTO playerDto = data.getUCPlayerInfo(secretKey);
 
                 for (UCBlockDTO block : playerDto.getBlocks()) {
-                    DimensionManager.getProvider(block.getDim()).worldObj.getBlock(block.getxCoord(), block.getyCoord(), block.getzCoord()).harvestBlock(DimensionManager.getProvider(block.getDim()).worldObj, player, block.getxCoord(), block.getyCoord(), block.getzCoord(), 1);
+
+                    if (DimensionManager.getProvider(block.getDim()).worldObj.getTileEntity(block.getxCoord(), block.getyCoord(), block.getzCoord()) instanceof IUCTile) {
+
+                        DimensionManager.getProvider(block.getDim()).worldObj.func_147480_a(block.getxCoord(), block.getyCoord(), block.getzCoord(), true);
+                        data.removeBlockFromPlayer(secretKey, block);
+                    }
                 }
 
             } catch (Exception e) {
