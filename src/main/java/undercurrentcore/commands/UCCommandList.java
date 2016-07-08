@@ -43,6 +43,15 @@ public class UCCommandList extends CommandBase {
 
                 UCPlayerDTO playerDto = data.getUCPlayerInfo(secretKey);
 
+                if(playerDto.getBlocks().size() < 1)
+                {
+                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA +
+                            "UnderCurrent: " +
+                            EnumChatFormatting.WHITE +
+                            StatCollector.translateToLocal("uclist.noblocks")));
+                    return;
+                }
+
                 for (UCBlockDTO block : playerDto.getBlocks()) {
 
                     sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD +

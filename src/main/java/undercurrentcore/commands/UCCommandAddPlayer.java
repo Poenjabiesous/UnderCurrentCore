@@ -7,22 +7,22 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.*;
-import net.minecraftforge.common.DimensionManager;
 import undercurrentcore.persist.UCBlockDTO;
+import undercurrentcore.persist.UCPlayerDTO;
 import undercurrentcore.persist.UCPlayersWorldData;
 
 import java.util.List;
 import java.util.UUID;
 
-public class UCCommandName extends CommandBase {
+public class UCCommandAddPlayer extends CommandBase {
     @Override
     public String getCommandName() {
-        return "ucname";
+        return "ucaddplayer";
     }
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/ucname <name>";
+        return "/ucaddplayer <player name>";
     }
 
 
@@ -42,22 +42,6 @@ public class UCCommandName extends CommandBase {
                     return;
                 }
 
-                if (params[0].toString().length() < 4) {
-                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA +
-                            "UnderCurrent: " +
-                            EnumChatFormatting.WHITE +
-                            StatCollector.translateToLocal("ucname.error.length")));
-                    return;
-                }
-
-                if (params[0].toString().length() > 20) {
-                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA +
-                            "UnderCurrent: " +
-                            EnumChatFormatting.WHITE +
-                            StatCollector.translateToLocal("ucname.error.length")));
-                    return;
-                }
-
                 UCPlayersWorldData data = (UCPlayersWorldData) MinecraftServer.getServer().getEntityWorld().perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
 
                 if (data != null) {
@@ -70,41 +54,79 @@ public class UCCommandName extends CommandBase {
 
                     if (mop != null && mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
                         if (player.worldObj.getTileEntity(mop.blockX, mop.blockY, mop.blockZ) instanceof IUCTile) {
-                            UCBlockDTO block = new UCBlockDTO(mop.blockX, mop.blockY, mop.blockZ, player.worldObj.provider.dimensionId, params[0].toString(), "");
                             String secretKey = data.getPlayerSecretKey(player.getUniqueID());
 
                             if (secretKey == null) {
                                 return;
                             }
 
-                            if (data.updateBlockName(secretKey, block)) {
+                            UCBlockDTO block = data.getBlockBySecretKeyAndCoords(secretKey, mop.blockX, mop.blockY, mop.blockZ, player.dimension);
+
+                            if (block != null) {
+
+                                UUID playerAddUUID = findPlayer(params[0]);
+
+                                if (playerAddUUID == null) {
+                                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA +
+                                            "UnderCurrent: " +
+                                            EnumChatFormatting.WHITE +
+                                            StatCollector.translateToLocal("ucaddplayer.error.notfound")));
+                                    return;
+                                }
+
+                                String secretKeyPlayerAdd = data.getPlayerSecretKey(playerAddUUID);
+
+                                if (secretKeyPlayerAdd == null) {
+                                    if (playerAddUUID == null) {
+                                        sender.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA +
+                                                "UnderCurrent: " +
+                                                EnumChatFormatting.WHITE +
+                                                StatCollector.translateToLocal("ucaddplayer.error.notreg")));
+                                        return;
+                                    }
+                                }
+
+                                if (data.playerOwnsBlockOnCoords(secretKey, block)) {
+                                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA +
+                                            "UnderCurrent: " +
+                                            EnumChatFormatting.WHITE +
+                                            StatCollector.translateToLocal("ucaddplayer.error.already")));
+                                    return;
+                                }
+
+                                if (data.addBlockToPlayer(secretKeyPlayerAdd, block)) {
+
+                                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA +
+                                            "UnderCurrent: " +
+                                            EnumChatFormatting.WHITE +
+                                            StatCollector.translateToLocal("ucaddplayer.info")));
+                                    return;
+                                }
+
                                 sender.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA +
                                         "UnderCurrent: " +
                                         EnumChatFormatting.WHITE +
-                                        StatCollector.translateToLocal("ucname.info")));
-                                return;
+                                        StatCollector.translateToLocal("ucaddplayer.error.block")));
+
                             } else {
                                 sender.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA +
                                         "UnderCurrent: " +
                                         EnumChatFormatting.WHITE +
-                                        StatCollector.translateToLocal("ucname.error.ownership")));
-                                return;
+                                        StatCollector.translateToLocal("ucaddplayer.error.ownership")));
                             }
 
                         } else {
                             sender.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA +
                                     "UnderCurrent: " +
                                     EnumChatFormatting.WHITE +
-                                    StatCollector.translateToLocal("ucname.error.block")));
-                            return;
+                                    StatCollector.translateToLocal("ucaddplayer.error.block")));
                         }
 
                     } else {
                         sender.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA +
                                 "UnderCurrent: " +
                                 EnumChatFormatting.WHITE +
-                                StatCollector.translateToLocal("ucname.error.block")));
-                        return;
+                                StatCollector.translateToLocal("ucaddplayer.error.block")));
                     }
                 }
 
@@ -113,4 +135,17 @@ public class UCCommandName extends CommandBase {
             }
         }
     }
+
+    private UUID findPlayer(String playerName) {
+
+        List<EntityPlayerMP> players = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
+
+        for (EntityPlayerMP player : players) {
+            if (player.getDisplayName().equals(playerName)) {
+                return player.getUniqueID();
+            }
+        }
+        return null;
+    }
+
 }

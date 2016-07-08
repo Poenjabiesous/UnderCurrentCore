@@ -7,6 +7,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.DimensionManager;
 import undercurrentcore.persist.UCBlockDTO;
 import undercurrentcore.persist.UCPlayerDTO;
@@ -41,14 +42,25 @@ public class UCCommandBreakAll extends CommandBase {
 
                 UCPlayerDTO playerDto = data.getUCPlayerInfo(secretKey);
 
+                int amountDropped = 0;
+
                 for (UCBlockDTO block : playerDto.getBlocks()) {
 
                     if (DimensionManager.getProvider(block.getDim()).worldObj.getTileEntity(block.getxCoord(), block.getyCoord(), block.getzCoord()) instanceof IUCTile) {
-
                         DimensionManager.getProvider(block.getDim()).worldObj.func_147480_a(block.getxCoord(), block.getyCoord(), block.getzCoord(), true);
                         data.removeBlockFromPlayer(secretKey, block);
+                        amountDropped++;
                     }
                 }
+
+                sender.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA +
+                        "UnderCurrent: " +
+                        EnumChatFormatting.WHITE +
+                        StatCollector.translateToLocal("ucbreak.info") +
+                        ": " +
+                        data.getPlayerSecretKey(player.getUniqueID()) +
+                        EnumChatFormatting.GOLD +
+                        amountDropped));
 
             } catch (Exception e) {
                 sender.addChatMessage(new ChatComponentText(getCommandUsage(sender)));

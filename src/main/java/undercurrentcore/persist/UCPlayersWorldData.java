@@ -93,6 +93,11 @@ public class UCPlayersWorldData extends WorldSavedData {
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
             if (player.getString(SECRET_KEY).equals(secretKey)) {
+
+                if (playerOwnsBlockOnCoords(secretKey, newBlock)) {
+                    return false;
+                }
+
                 NBTTagCompound blockToBeAdded = new NBTTagCompound();
                 blockToBeAdded.setInteger(X_COORD, newBlock.getxCoord());
                 blockToBeAdded.setInteger(Y_COORD, newBlock.getyCoord());
@@ -188,6 +193,25 @@ public class UCPlayersWorldData extends WorldSavedData {
             }
         }
         return null;
+    }
+
+    public boolean playerOwnsBlockOnCoords(String secretKey, UCBlockDTO block) {
+        for (int i = 0; i < data.tagCount(); i++) {
+            NBTTagCompound player = data.getCompoundTagAt(i);
+            if (player.getString(SECRET_KEY).equals(secretKey)) {
+                NBTTagList blocks = player.getTagList(BLOCKS, Constants.NBT.TAG_COMPOUND);
+                for (int j = 0; j < blocks.tagCount(); j++) {
+                    NBTTagCompound currentBlock = blocks.getCompoundTagAt(j);
+                    if (currentBlock.getInteger(X_COORD) == block.getxCoord()
+                            && currentBlock.getInteger(Y_COORD) == block.getyCoord()
+                            && currentBlock.getInteger(Z_COORD) == block.getzCoord()
+                            && currentBlock.getInteger(DIM) == block.getDim()) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public boolean updateBlockName(String secretKey, UCBlockDTO newBlock) {

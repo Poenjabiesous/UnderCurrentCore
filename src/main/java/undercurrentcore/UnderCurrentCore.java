@@ -5,10 +5,7 @@ import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
-import undercurrentcore.commands.UCCommandBreakAll;
-import undercurrentcore.commands.UCCommandLink;
-import undercurrentcore.commands.UCCommandList;
-import undercurrentcore.commands.UCCommandName;
+import undercurrentcore.commands.*;
 import undercurrentcore.persist.UCConfiguration;
 import undercurrentcore.proxy.CommonProxy;
 import undercurrentcore.reference.ModInfo;
@@ -51,6 +48,7 @@ public class UnderCurrentCore {
         event.registerServerCommand(new UCCommandLink());
         event.registerServerCommand(new UCCommandList());
         event.registerServerCommand(new UCCommandBreakAll());
+        event.registerServerCommand(new UCCommandAddPlayer());
     }
 
     @EventHandler
