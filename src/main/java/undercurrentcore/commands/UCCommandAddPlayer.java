@@ -86,7 +86,7 @@ public class UCCommandAddPlayer extends CommandBase {
                                     }
                                 }
 
-                                if (data.playerOwnsBlockOnCoords(secretKey, block)) {
+                                if (data.playerOwnsBlock(secretKey, block)) {
                                     sender.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA +
                                             "UnderCurrent: " +
                                             EnumChatFormatting.WHITE +

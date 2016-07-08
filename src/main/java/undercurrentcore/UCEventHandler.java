@@ -17,6 +17,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.*;
 import net.minecraftforge.client.event.RenderWorldEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -71,7 +72,7 @@ public class UCEventHandler {
                 String[] lines = new String[1];
                 lines[0] = block.getName();
 
-                RenderFloatingText(lines, (float) block.getxCoord() + 0.5F, (float) block.getyCoord() + 1.0F, (float) block.getzCoord() +0.5F, Color.LIGHT_GRAY.hashCode(), true, event.partialTicks);
+                RenderFloatingText(lines, (float) block.getxCoord() + 0.5F, (float) block.getyCoord() + 1.0F, (float) block.getzCoord() + 0.5F, Color.LIGHT_GRAY.hashCode(), true, event.partialTicks);
             }
         }
     }
@@ -92,10 +93,18 @@ public class UCEventHandler {
                 boolean registered = data.checkPlayerOnUUID(player.getUniqueID());
 
                 if (registered) {
+
                     String secretKey = data.getPlayerSecretKey(player.getUniqueID());
+
                     if (secretKey == null) {
                         event.setCanceled(true);
                         return;
+                    }
+
+                    for (UCBlockDTO block : data.getUCPlayerInfo(secretKey).getBlocks()) {
+                        if ((DimensionManager.getWorld(block.getDim()).getTileEntity(block.getxCoord(), block.getyCoord(), block.getzCoord()) instanceof IUCTile)) {
+                            data.removeBlockFromPlayer(secretKey, block);
+                        }
                     }
                 }
 
@@ -152,21 +161,32 @@ public class UCEventHandler {
                 UCPlayersWorldData data = (UCPlayersWorldData) MinecraftServer.getServer().getEntityWorld().perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
                 String secretKey = data.getPlayerSecretKey(event.getPlayer().getUniqueID());
 
-                if (secretKey == null) {
+                if (secretKey == null && !event.getPlayer().capabilities.isCreativeMode) {
                     event.setCanceled(true);
                     return;
                 }
 
-                boolean removed = data.removeBlockFromPlayer(secretKey, new UCBlockDTO(event.x, event.y, event.z, event.getPlayer().worldObj.provider.dimensionId, "", ""));
-                if (removed) {
+                if (data.removeBlockFromPlayer(secretKey, new UCBlockDTO(event.x, event.y, event.z, event.getPlayer().worldObj.provider.dimensionId, "", ""))) {
+                    event.getPlayer().addChatComponentMessage(new ChatComponentText(EnumChatFormatting.AQUA +
+                            "UnderCurrent: " +
+                            EnumChatFormatting.WHITE +
+                            StatCollector.translateToLocal("blockBroken.info") +
+                            ": " +
+                            "<" + event.x + "> <" + event.y + "> <" + event.z + "> Dim: " + event.getPlayer().worldObj.provider.getDimensionName()
+                    ));
+                } else {
 
                     event.getPlayer().addChatComponentMessage(new ChatComponentText(EnumChatFormatting.AQUA +
                             "UnderCurrent: " +
                             EnumChatFormatting.WHITE +
-                            StatCollector.translateToLocal("blockBroken.info.1") +
+                            StatCollector.translateToLocal("blockBroken.error") +
                             ": " +
                             "<" + event.x + "> <" + event.y + "> <" + event.z + "> Dim: " + event.getPlayer().worldObj.provider.getDimensionName()
                     ));
+
+                    if (!event.getPlayer().capabilities.isCreativeMode) {
+                        event.setCanceled(true);
+                    }
                 }
             }
         } else {

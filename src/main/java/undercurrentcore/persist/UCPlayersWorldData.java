@@ -94,7 +94,7 @@ public class UCPlayersWorldData extends WorldSavedData {
             NBTTagCompound player = data.getCompoundTagAt(i);
             if (player.getString(SECRET_KEY).equals(secretKey)) {
 
-                if (playerOwnsBlockOnCoords(secretKey, newBlock)) {
+                if (playerOwnsBlock(secretKey, newBlock)) {
                     return false;
                 }
 
@@ -195,7 +195,7 @@ public class UCPlayersWorldData extends WorldSavedData {
         return null;
     }
 
-    public boolean playerOwnsBlockOnCoords(String secretKey, UCBlockDTO block) {
+    public boolean playerOwnsBlock(String secretKey, UCBlockDTO block) {
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
             if (player.getString(SECRET_KEY).equals(secretKey)) {
