@@ -246,7 +246,7 @@ public class UCCoreImplServlet extends HttpServlet {
                             }
 
                             if (className.contains("Float") || className.contains("float")) {
-                                field.set(te, currentIteration.get("fieldValue").getAsDouble());
+                                field.set(te, currentIteration.get("fieldValue").getAsFloat());
                                 break;
                             }
 
