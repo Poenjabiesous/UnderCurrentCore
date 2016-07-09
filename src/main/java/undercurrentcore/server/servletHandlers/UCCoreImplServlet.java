@@ -155,8 +155,6 @@ public class UCCoreImplServlet extends HttpServlet {
 
             ArrayList<Field> fields = new ArrayList<Field>();
             addDeclaredAndInheritedFields(te.getClass(), fields);
-            System.out.println("Amount: " + fields.size());
-
 
             if (te == null) {
                 RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.WORLD_TE_DOES_NOT_EXIST.toString());
@@ -232,7 +230,6 @@ public class UCCoreImplServlet extends HttpServlet {
                     }
 
                     for (Field field : fields) {
-                        System.out.println(field.getName());
                         if (field.getName().equalsIgnoreCase(currentIteration.get("fieldName").getAsString())) {
                             field.setAccessible(true);
 
