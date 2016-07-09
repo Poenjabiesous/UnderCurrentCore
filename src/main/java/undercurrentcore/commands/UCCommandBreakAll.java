@@ -58,7 +58,7 @@ public class UCCommandBreakAll extends CommandBase {
                         EnumChatFormatting.WHITE +
                         StatCollector.translateToLocal("ucbreak.info") +
                         ": " +
-                        
+
                         EnumChatFormatting.GOLD +
                         amountDropped));
 

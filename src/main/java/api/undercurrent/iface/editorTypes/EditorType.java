@@ -20,7 +20,7 @@ public abstract class EditorType {
     public abstract Object getFieldValue();
 
     public enum EditorTypes {
-        STRING, INT, DOUBLE, BOOLEAN, INFO, COMBO
+        STRING, INT, DOUBLE, FLOAT, BOOLEAN, INFO, COMBO, CUSTOM
     }
 
     public EditorTypes getEditorType() {
