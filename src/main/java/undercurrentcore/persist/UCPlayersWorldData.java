@@ -59,6 +59,16 @@ public class UCPlayersWorldData extends WorldSavedData {
         return true;
     }
 
+    public boolean validatePlayerSecretKey(String secretKey) {
+        for (int i = 0; i < data.tagCount(); i++) {
+            NBTTagCompound player = data.getCompoundTagAt(i);
+            if (player.getString(SECRET_KEY).equals(secretKey)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public String getPlayerSecretKey(UUID uuid) {
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);

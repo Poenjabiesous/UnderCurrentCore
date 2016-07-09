@@ -6,6 +6,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import undercurrentcore.persist.UCConfiguration;
+import undercurrentcore.server.servletHandlers.UCAuthImplServlet;
 import undercurrentcore.server.servletHandlers.UCCoreImplServlet;
 
 import java.io.IOException;
@@ -26,6 +27,7 @@ public class ServerWrapper {
         context.setContextPath("/undercurrentcore");
         server.setHandler(context);
         context.addServlet(new ServletHolder(new UCCoreImplServlet()), "/core");
+        context.addServlet(new ServletHolder(new UCAuthImplServlet()), "/auth");
 
         try {
             server.start();
