@@ -32,7 +32,7 @@ public class UCCommandBreakAll extends CommandBase {
             EntityPlayer player = (EntityPlayer) sender;
             try {
 
-                UCPlayersWorldData data = (UCPlayersWorldData) MinecraftServer.getServer().getEntityWorld().perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
+                UCPlayersWorldData data = (UCPlayersWorldData) DimensionManager.getWorld(0).perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
 
                 String secretKey = data.getPlayerSecretKey(player.getUniqueID());
 
@@ -58,7 +58,7 @@ public class UCCommandBreakAll extends CommandBase {
                         EnumChatFormatting.WHITE +
                         StatCollector.translateToLocal("ucbreak.info") +
                         ": " +
-                        data.getPlayerSecretKey(player.getUniqueID()) +
+                        
                         EnumChatFormatting.GOLD +
                         amountDropped));
 

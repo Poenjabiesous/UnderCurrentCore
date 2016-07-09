@@ -53,7 +53,7 @@ public class UCCoreImplServlet extends HttpServlet {
             return;
         }
 
-        UCPlayersWorldData data = (UCPlayersWorldData) MinecraftServer.getServer().getEntityWorld().perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
+        UCPlayersWorldData data = (UCPlayersWorldData)DimensionManager.getWorld(0).perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
 
         if (!data.checkPlayerOnSecretKey(secretKey)) {
             RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.USER_NOT_REGISTERED.toString());
@@ -112,7 +112,7 @@ public class UCCoreImplServlet extends HttpServlet {
             return;
         }
 
-        UCPlayersWorldData worldData = (UCPlayersWorldData) MinecraftServer.getServer().getEntityWorld().perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
+        UCPlayersWorldData worldData = (UCPlayersWorldData) DimensionManager.getWorld(0).perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
 
         if (!worldData.checkPlayerOnSecretKey(secretKey)) {
             RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.USER_NOT_REGISTERED.toString());

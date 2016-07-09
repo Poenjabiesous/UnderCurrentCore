@@ -32,7 +32,7 @@ public class UCCommandLink extends CommandBase {
             EntityPlayer player = (EntityPlayer) sender;
             try {
 
-                UCPlayersWorldData data = (UCPlayersWorldData) MinecraftServer.getServer().getEntityWorld().perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
+                UCPlayersWorldData data = (UCPlayersWorldData) DimensionManager.getWorld(0).perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
 
                 if (data != null) {
 

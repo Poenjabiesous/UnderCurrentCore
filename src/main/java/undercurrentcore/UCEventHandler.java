@@ -1,6 +1,7 @@
 package undercurrentcore;
 
 import api.undercurrent.iface.IUCTile;
+import api.undercurrent.iface.editorTypes.EditorType;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
@@ -35,55 +36,14 @@ import java.io.IOException;
 
 public class UCEventHandler {
 
-    private RenderManager renderManager = RenderManager.instance;
-
-    @SideOnly(Side.CLIENT)
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void renderWorldLastEvent(RenderWorldLastEvent event) {
-
-        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-
-        Vec3 vec3 = Vec3.createVectorHelper(player.posX, player.posY + ((player.getEyeHeight() - player.getDefaultEyeHeight())), player.posZ);
-        Vec3 vec3a = player.getLookVec();
-        Vec3 vec3b = vec3.addVector(vec3a.xCoord * 5.0F, vec3a.yCoord * 5.0F, vec3a.zCoord * 5.0F);
-
-        MovingObjectPosition mop = player.worldObj.rayTraceBlocks(vec3, vec3b);
-
-        if (mop != null && mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-            if (player.worldObj.getTileEntity(mop.blockX, mop.blockY, mop.blockZ) instanceof IUCTile) {
-
-                UCPlayersWorldData data = (UCPlayersWorldData) MinecraftServer.getServer().getEntityWorld().perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
-                String secretKey = data.getPlayerSecretKey(player.getUniqueID());
-
-                if (secretKey == null) {
-                    return;
-                }
-
-                UCBlockDTO block = data.getBlockBySecretKeyAndCoords(secretKey, mop.blockX, mop.blockY, mop.blockZ, player.dimension);
-
-                if (block == null) {
-                    return;
-                }
-
-                if (!(player.worldObj.getTileEntity(mop.blockX, mop.blockY, mop.blockZ) instanceof IUCTile)) {
-                    return;
-                }
-
-                String[] lines = new String[1];
-                lines[0] = block.getName();
-
-                RenderFloatingText(lines, (float) block.getxCoord() + 0.5F, (float) block.getyCoord() + 1.0F, (float) block.getzCoord() + 0.5F, Color.LIGHT_GRAY.hashCode(), true, event.partialTicks);
-            }
-        }
-    }
-
+    @SideOnly(Side.SERVER)
     @SubscribeEvent
     public void onEntityJoinWorldEvent(EntityJoinWorldEvent event) {
         if (event.entity != null && !event.entity.worldObj.isRemote) {
             if (event.entity instanceof EntityPlayer) {
                 EntityPlayer player = (EntityPlayer) event.entity;
 
-                UCPlayersWorldData data = (UCPlayersWorldData) MinecraftServer.getServer().getEntityWorld().perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
+                UCPlayersWorldData data = (UCPlayersWorldData) DimensionManager.getWorld(0).perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
 
                 if (data == null) {
                     data = new UCPlayersWorldData(UCPlayersWorldData.GLOBAL_TAG);
@@ -121,12 +81,13 @@ public class UCEventHandler {
         }
     }
 
+    @SideOnly(Side.SERVER)
     @SubscribeEvent
     public void onBlockPlaced(BlockEvent.PlaceEvent event) {
         if (event.player != null && !event.player.worldObj.isRemote) {
             if (event.player instanceof EntityPlayer && event.placedBlock instanceof BlockContainer && ((BlockContainer) event.placedBlock).createNewTileEntity(event.player.worldObj, 0) instanceof IUCTile) {
 
-                UCPlayersWorldData data = (UCPlayersWorldData) MinecraftServer.getServer().getEntityWorld().perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
+                UCPlayersWorldData data = (UCPlayersWorldData) DimensionManager.getWorld(0).perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
                 String secretKey = data.getPlayerSecretKey(event.player.getUniqueID());
 
                 if (secretKey == null) {
@@ -153,12 +114,13 @@ public class UCEventHandler {
         }
     }
 
+    @SideOnly(Side.SERVER)
     @SubscribeEvent
     public void onBlockBroken(BlockEvent.BreakEvent event) {
         if (event.getPlayer() != null && !event.getPlayer().worldObj.isRemote) {
             if (event.getPlayer() instanceof EntityPlayer && event.block instanceof BlockContainer && ((BlockContainer) event.block).createNewTileEntity(event.getPlayer().worldObj, 0) instanceof IUCTile) {
 
-                UCPlayersWorldData data = (UCPlayersWorldData) MinecraftServer.getServer().getEntityWorld().perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
+                UCPlayersWorldData data = (UCPlayersWorldData) DimensionManager.getWorld(0).perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
                 String secretKey = data.getPlayerSecretKey(event.getPlayer().getUniqueID());
 
                 if (secretKey == null && !event.getPlayer().capabilities.isCreativeMode) {
@@ -194,10 +156,7 @@ public class UCEventHandler {
         }
     }
 
-    public FontRenderer getFontRendererFromRenderManager() {
-        return this.renderManager.getFontRenderer();
-    }
-
+    @SideOnly(Side.CLIENT)
     public static void RenderFloatingText(String[] text, float x, float y, float z, int color, boolean renderBlackBox, float partialTickTime) {
 
         //Thanks to Electric-Expansion mod for the majority of this code

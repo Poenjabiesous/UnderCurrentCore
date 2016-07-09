@@ -7,6 +7,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.*;
+import net.minecraftforge.common.DimensionManager;
 import undercurrentcore.persist.UCBlockDTO;
 import undercurrentcore.persist.UCPlayerDTO;
 import undercurrentcore.persist.UCPlayersWorldData;
@@ -42,7 +43,7 @@ public class UCCommandAddPlayer extends CommandBase {
                     return;
                 }
 
-                UCPlayersWorldData data = (UCPlayersWorldData) MinecraftServer.getServer().getEntityWorld().perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
+                UCPlayersWorldData data = (UCPlayersWorldData) DimensionManager.getWorld(0).perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
 
                 if (data != null) {
 
