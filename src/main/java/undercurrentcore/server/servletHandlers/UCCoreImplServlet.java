@@ -6,10 +6,12 @@ import api.undercurrent.iface.UCTileDefinition;
 import api.undercurrent.iface.editorTypes.EditorType;
 import com.google.common.base.Throwables;
 import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.DimensionManager;
+import scala.reflect.internal.Trees;
 import undercurrentcore.persist.UCBlockDTO;
 import undercurrentcore.persist.UCPlayersWorldData;
 import undercurrentcore.server.RequestReturnObject;
@@ -20,8 +22,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -53,7 +56,7 @@ public class UCCoreImplServlet extends HttpServlet {
             return;
         }
 
-        UCPlayersWorldData data = (UCPlayersWorldData)DimensionManager.getWorld(0).perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
+        UCPlayersWorldData data = (UCPlayersWorldData) DimensionManager.getWorld(0).perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
 
         if (!data.checkPlayerOnSecretKey(secretKey)) {
             RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.USER_NOT_REGISTERED.toString());
@@ -148,8 +151,12 @@ public class UCCoreImplServlet extends HttpServlet {
                 return;
             }
 
-            JsonObject swapper = new JsonObject();
             TileEntity te = DimensionManager.getWorld(blockToUpdate.getDim()).getTileEntity(blockToUpdate.getxCoord(), blockToUpdate.getyCoord(), blockToUpdate.getzCoord());
+
+            ArrayList<Field> fields = new ArrayList<Field>();
+            addDeclaredAndInheritedFields(te.getClass(), fields);
+            System.out.println("Amount: " + fields.size());
+
 
             if (te == null) {
                 RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.WORLD_TE_DOES_NOT_EXIST.toString());
@@ -224,24 +231,61 @@ public class UCCoreImplServlet extends HttpServlet {
                         return;
                     }
 
-                    swapper.add(currentIteration.get("fieldName").getAsString(), currentIteration.get("fieldValue"));
+                    for (Field field : fields) {
+                        System.out.println(field.getName());
+                        if (field.getName().equalsIgnoreCase(currentIteration.get("fieldName").getAsString())) {
+                            field.setAccessible(true);
+
+                            String className = field.getType().getCanonicalName();
+
+                            if (className.contains("Boolean") || className.contains("boolean")) {
+                                field.set(te, currentIteration.get("fieldValue").getAsBoolean());
+                                break;
+                            }
+
+                            if (className.contains("Double") || className.contains("double")) {
+                                field.set(te, currentIteration.get("fieldValue").getAsDouble());
+                                break;
+                            }
+
+                            if (className.contains("Float") || className.contains("float")) {
+                                field.set(te, currentIteration.get("fieldValue").getAsDouble());
+                                break;
+                            }
+
+                            if (className.contains("Int") || className.contains("int")) {
+                                field.set(te, currentIteration.get("fieldValue").getAsInt());
+                                break;
+                            }
+
+                            if (className.contains("String") || className.contains("string")) {
+                                field.set(te, currentIteration.get("fieldValue").getAsString());
+                                break;
+                            }
+
+                            RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.CANT_USE_FIELD.toString() + ": " + currentIteration.get("fieldName").getAsString());
+                            resp.getWriter().write(gson.toJson(rro));
+                        }
+                    }
+
                 } catch (Exception e) {
+                    System.out.println(Throwables.getStackTraceAsString(e));
                     RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.CANT_USE_FIELD.toString() + ": " + currentIteration.get("fieldName").getAsString());
                     resp.getWriter().write(gson.toJson(rro));
                     return;
                 }
             }
-
-            try {
-                te.getWorldObj().setTileEntity(blockToUpdate.getxCoord(), blockToUpdate.getyCoord(), blockToUpdate.getzCoord(), gson.fromJson(swapper, te.getClass()));
-            } catch (Exception e) {
-                RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.CANT_DO_TE_SWOP.toString() + "::" + e.getMessage());
-                resp.getWriter().write(gson.toJson(rro));
-                return;
-            }
+            te.getWorldObj().markBlockForUpdate(blockToUpdate.getxCoord(), blockToUpdate.getyCoord(), blockToUpdate.getzCoord());
         }
-
         RequestReturnObject rro = new RequestReturnObject(true);
         resp.getWriter().write(gson.toJson(rro));
+    }
+
+    private static void addDeclaredAndInheritedFields(Class<?> c, ArrayList<Field> fields) {
+        fields.addAll(Arrays.asList(c.getDeclaredFields()));
+        Class<?> superClass = c.getSuperclass();
+        if (superClass != null) {
+            addDeclaredAndInheritedFields(superClass, fields);
+        }
     }
 }
