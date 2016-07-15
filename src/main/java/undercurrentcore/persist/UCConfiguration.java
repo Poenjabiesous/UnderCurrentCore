@@ -10,8 +10,7 @@ import java.io.File;
 public class UCConfiguration {
 
     private static int serverAPIPort;
-    private static int chatWebSocketPortRead;
-    private static int chatWebSocketPortWrite;
+    private static int serverWebPort;
 
     public static void init(File configFile) {
 
@@ -19,8 +18,7 @@ public class UCConfiguration {
         config.load();
 
         serverAPIPort = config.get("serverAPIPort", "Server", 777).getInt();
-        chatWebSocketPortRead = config.get("chatWebSocketPortRead", "Server", 780).getInt();
-        chatWebSocketPortWrite = config.get("chatWebSocketPortWrite", "Server", 783).getInt();
+        serverWebPort = config.get("serverWebPort", "Server", 778).getInt();
 
         if (config.hasChanged()) {
             config.save();
@@ -31,11 +29,7 @@ public class UCConfiguration {
         return serverAPIPort;
     }
 
-    public static int getChatWebSocketPortRead() {
-        return chatWebSocketPortRead;
-    }
-
-    public static int getChatWebSocketPortWrite() {
-        return chatWebSocketPortWrite;
+    public static int getServerWebPort() {
+        return serverWebPort;
     }
 }

@@ -1,5 +1,6 @@
 package undercurrentcore;
 
+import com.google.common.base.Throwables;
 import cpw.mods.fml.common.event.*;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -42,7 +43,11 @@ public class UnderCurrentCore {
     @EventHandler
     public void serverStarting(FMLServerStartingEvent event) {
         logger.info("UnderCurrentCore: Starting Server.");
-        ServerWrapper.startUCServer();
+        try {
+            ServerWrapper.startUCServer();
+        } catch (Exception e) {
+            logger.severe("Cound not start UnderCurrent server due to: " + Throwables.getStackTraceAsString(e));
+        }
         System.out.println("UnderCurrentCore: Registering commands.");
         event.registerServerCommand(new UCCommandName());
         event.registerServerCommand(new UCCommandLink());
