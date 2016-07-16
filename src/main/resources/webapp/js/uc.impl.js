@@ -3,7 +3,6 @@
 
         var baseServerUrl="http://"+location.hostname;
         var coreAuthUrl=baseServerUrl+":777/undercurrentcore/auth";
-        window.alert(coreAuthUrl + "?secretKey="+ document.getElementById("secretKey").value);
 
         $.ajax({
                 url: coreAuthUrl + "?secretKey="+ document.getElementById("secretKey").value,
@@ -25,6 +24,8 @@
                 }
             });
      }
+
+
 
     function populateBlocks()
     {
@@ -114,13 +115,44 @@
 
                                             else
                                             {
-                                                var inputId = "input" + k;
-                                                $("#fieldList").append("<ul id='ul"+k+"'>"
-                                                + "<li><label>"+editableField.displayName+"</label></li>"
-                                                + "<li><input id="+JSON.stringify(inputId)+" type='text' value='"+editableField.fieldValue+"'</input></li>"
-                                                + "<li><a onclick='postChanges("+JSON.stringify(editableField.fieldName)+", document.getElementById("+JSON.stringify(inputId)+").value)' class='button big special'>Save</a></li>"
-                                                + "</ul>");
-                                                $("#ul"+k).addClass("actions");
+                                                if(editableField.editorType == "BOOLEAN")
+                                                {
+                                                    var inputId = "input" + k;
+                                                    var sliderId = "slider" + k;
+                                                    var insetId = "inset" + k;
+                                                    var controlId = "control" + k;
+
+
+                                                    $("#fieldList").append("<ul id='ul"+k+"'>"
+                                                    + "<li><label>"+editableField.displayName+"</label></li>"
+                                                    + "<li><div onclick='sliderClicked("+JSON.stringify(sliderId)+")' id="+JSON.stringify(sliderId)+"><div id="+JSON.stringify(insetId)+"><div id="+JSON.stringify(controlId)+"></div></div></div></li>"
+                                                    + "<li><a onclick='postChangesBoolean("+JSON.stringify(editableField.fieldName)+", "+JSON.stringify(sliderId)+")' class='button big special'>Save</a></li>"
+                                                    + "</ul>");
+                                                    $("#ul"+k).addClass("actions");
+
+                                                    if(editableField.fieldValue == true)
+                                                    {
+                                                      $("#"+sliderId).addClass("bool-slider true");
+                                                    }
+                                                    else
+                                                    {
+                                                      $("#"+sliderId).addClass("bool-slider false");
+                                                    }
+
+                                                     $("#"+insetId).addClass("inset");
+                                                     $("#"+controlId).addClass("control");
+                                                }
+
+                                                else
+                                                {
+                                                    var inputId = "input" + k;
+                                                    $("#fieldList").append("<ul id='ul"+k+"'>"
+                                                    + "<li><label>"+editableField.displayName+"</label></li>"
+                                                    + "<li><input id="+JSON.stringify(inputId)+" type='text' value='"+editableField.fieldValue+"'</input></li>"
+                                                    + "<li><a onclick='postChanges("+JSON.stringify(editableField.fieldName)+", document.getElementById("+JSON.stringify(inputId)+").value)' class='button big special'>Save</a></li>"
+                                                    + "</ul>");
+                                                    $("#ul"+k).addClass("actions");
+                                                }
                                             }
                                         }
                                      }
@@ -138,6 +170,18 @@
                      });
           }
 
+    function sliderClicked(id)
+    {
+        if($("#"+id).hasClass("true"))
+        {
+             $("#"+id).removeClass("true").addClass("false");
+        }
+        else
+        {
+             $("#"+id).removeClass("false").addClass("true");
+        }
+    }
+
 
 
     function editBlock(element)
@@ -146,6 +190,39 @@
         window.location.href = url;
     }
 
+     function postChangesBoolean(fieldName, sliderId)
+        {
+            var slider = $("#"+sliderId).hasClass("true");
+
+            var baseServerUrl="http://"+location.hostname;
+            var coreCoreUrl=baseServerUrl+":777/undercurrentcore/core";
+            var secretKey = getUrlParameter("secretKey");
+            var jsonToPost = JSON.stringify({"data":[{"internalName": getUrlParameter("internalName"), "editedData":[{"fieldName":fieldName,"fieldValue":slider}]}]})
+
+                    $.ajax({
+                        url: coreCoreUrl+"?secretKey="+ secretKey,
+                        type: "POST",
+                        data:jsonToPost,
+                        dataType: "json",
+                        cache: false,
+                        contentType: false,
+                        success: function(responseData) {
+
+                                if(responseData.status == true)
+                                {
+
+                                }
+                                else
+                                {
+                                    document.getElementById("info").innerText = "Server error::"+resolveErrorType(responseData.error_message);
+                                }
+                                },
+                        error: function(xhr, status, error) {
+                                    document.getElementById("info").innerText = "Error communicating with server: " + status + "::" + xhr.responseText;
+                                }
+                            });
+        }
+
     function postChanges(fieldName, fieldValue)
     {
 
@@ -153,7 +230,7 @@
         var coreCoreUrl=baseServerUrl+":777/undercurrentcore/core";
         var secretKey = getUrlParameter("secretKey");
         var jsonToPost = JSON.stringify({"data":[{"internalName": getUrlParameter("internalName"), "editedData":[{"fieldName":fieldName,"fieldValue":fieldValue}]}]})
-        window.alert(jsonToPost);
+
                 $.ajax({
                     url: coreCoreUrl+"?secretKey="+ secretKey,
                     type: "POST",
@@ -165,7 +242,7 @@
 
                             if(responseData.status == true)
                             {
-                                window.location.reload(true);
+
                             }
                             else
                             {
@@ -274,6 +351,5 @@
             }
         }
     };
-
 
 
