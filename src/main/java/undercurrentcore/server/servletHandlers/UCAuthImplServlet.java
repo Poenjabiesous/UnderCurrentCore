@@ -44,8 +44,6 @@ public class UCAuthImplServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        logger.info("Got one");
-
         resp.setContentType("text/html;charset=utf-8");
         resp.setStatus(HttpServletResponse.SC_OK);
 
@@ -61,10 +59,15 @@ public class UCAuthImplServlet extends HttpServlet {
         UCPlayersWorldData data = (UCPlayersWorldData) DimensionManager.getWorld(0).perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
 
         if (data.validatePlayerSecretKey(secretKey)) {
-            RequestReturnObject rro = new RequestReturnObject(true);
+            JsonObject response = new JsonObject();
+            response.addProperty("auth", true);
+            RequestReturnObject rro = new RequestReturnObject(true, response);
+
             resp.getWriter().write(gson.toJson(rro));
         } else {
-            RequestReturnObject rro = new RequestReturnObject(false);
+            JsonObject response = new JsonObject();
+            response.addProperty("auth", false);
+            RequestReturnObject rro = new RequestReturnObject(true, response);
             resp.getWriter().write(gson.toJson(rro));
         }
     }

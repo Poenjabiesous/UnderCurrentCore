@@ -5,6 +5,7 @@ import api.undercurrent.iface.UCCollection;
 import api.undercurrent.iface.UCTileDefinition;
 import api.undercurrent.iface.editorTypes.EditorType;
 import com.google.common.base.Throwables;
+import com.google.common.io.CharStreams;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import net.minecraft.entity.player.EntityPlayer;
@@ -22,6 +23,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -124,7 +126,7 @@ public class UCCoreImplServlet extends HttpServlet {
         }
 
         JsonParser parser = new JsonParser();
-        JsonObject obj = parser.parse(req.getReader()).getAsJsonObject();
+        JsonObject obj = parser.parse(CharStreams.toString(new InputStreamReader(req.getInputStream()))).getAsJsonObject();
 
         if (!obj.has("data")) {
             RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.MISSING_BODY_MEMBER.toString() + "::data");

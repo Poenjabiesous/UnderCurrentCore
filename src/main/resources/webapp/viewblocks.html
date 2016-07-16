@@ -1,9 +1,5 @@
 <!DOCTYPE HTML>
-<!--
-	Ion by TEMPLATED
-	templated.co @templatedco
-	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
--->
+
 <html>
 <head>
     <title>UnderCurrent</title>
@@ -11,7 +7,8 @@
     <meta name="description" content=""/>
     <meta name="keywords" content=""/>
     <!--[if lte IE 8]>
-    <script src="js/html5shiv.js"></script><![endif]-->
+    <script src="js/html5shiv.js"></script>
+    <![endif]-->
     <script src="js/jquery.min.js"></script>
     <script src="js/skel.min.js"></script>
     <script src="js/skel-layers.min.js"></script>
@@ -22,6 +19,15 @@
         <link rel="stylesheet" href="css/style.css"/>
         <link rel="stylesheet" href="css/style-xlarge.css"/>
     </noscript>
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+
+    <script>
+         $( document ).ready(function() {
+            populateBlocks();
+         });
+    </script>
 </head>
 <body id="top">
 
@@ -39,8 +45,8 @@
 <!-- Banner -->
 <section id="banner">
     <div class="inner">
-        <p><img src="images/logo.png"></p>
-        <h2>UnderCurrent</h2>
+        <p><img src="images/logo.png" height="60" width="60"></p>
+
         <p>
             <nav id="nav">
                 <ul class="icons">
@@ -51,23 +57,13 @@
             </nav>
         </p>
 
-        <p>&nbsp</p>
+        <p id="info">Your blocks:</p>
+        <div class="alt" id="blocklist">
 
-        <p id="info">Enter your secret key to proceed:</p>
-        <ul class="actions">
-            <li><input type="text" value="Secret Key" id="secretKey"></input></li>
-            <li><a class="button big special" onclick="authAndLogin()">Log In</a></li>
-        </ul>
-
-        <p>&nbsp</p>
-
-        <h5>Like our work? Consider keeping us motivated on</h5>
-        <img src="images/patreon.png" height="100" width="100">
-
+        </div>
         <p>&nbsp</p>
         <h6>Page created by the UnderCurrentTeam 2016</h6>
         <img src="images/logo.png" height="40" width="40">
-
     </div>
 </section>
 

@@ -9,27 +9,28 @@ import java.io.File;
  */
 public class UCConfiguration {
 
-    private static int serverAPIPort;
     private static int serverWebPort;
+    private static String webContextBinding;
 
     public static void init(File configFile) {
 
         Configuration config = new Configuration(configFile);
         config.load();
 
-        serverAPIPort = config.get("serverAPIPort", "Server", 777).getInt();
         serverWebPort = config.get("serverWebPort", "Server", 778).getInt();
+        webContextBinding = config.get("webContextBinding", "Server", "/undercurrentweb").getString();
 
         if (config.hasChanged()) {
             config.save();
         }
     }
 
-    public static int getServerAPIPort() {
-        return serverAPIPort;
-    }
-
     public static int getServerWebPort() {
         return serverWebPort;
     }
+
+    public static String getWebContextBinding() {
+        return webContextBinding;
+    }
+
 }
