@@ -10,18 +10,47 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     <meta name="description" content=""/>
     <meta name="keywords" content=""/>
+    <meta http-equiv="cache-control" content="no-cache, must-revalidate, post-check=0, pre-check=0">
+    <meta http-equiv="expires" content="Sat, 31 Oct 2014 00:00:00 GMT">
+    <meta http-equiv="pragma" content="no-cache">
     <!--[if lte IE 8]>
     <script src="js/html5shiv.js"></script><![endif]-->
     <script src="js/jquery.min.js"></script>
     <script src="js/skel.min.js"></script>
     <script src="js/skel-layers.min.js"></script>
     <script src="js/init.js"></script>
-    <script src="js/uc.impl.js"></script>
+    <script src="js/uc.common.js"></script>
     <noscript>
         <link rel="stylesheet" href="css/skel.css"/>
         <link rel="stylesheet" href="css/style.css"/>
         <link rel="stylesheet" href="css/style-xlarge.css"/>
     </noscript>
+    <script>
+
+    function authAndLogin() {
+
+     var baseServerUrl = "http://" + location.hostname;
+     var coreAuthUrl = baseServerUrl + ":777/undercurrentcore/auth";
+
+     $.ajax({
+         url: coreAuthUrl + "?secretKey=" + document.getElementById("secretKey").value,
+         type: "GET",
+         dataType: "json",
+         success: function(responseData) {
+             if (responseData.data.auth == true) {
+                 var url = "viewtiles.html?secretKey=" + encodeURIComponent(document.getElementById("secretKey").value);
+                 window.location.href = url;
+             } else {
+                 document.getElementById("info").innerText = "Could not log you in. Secret key not registered on this server.";
+             }
+         },
+         error: function(xhr, status, error) {
+             document.getElementById("info").innerText = "Error communicating with server: " + status + ":" + xhr.responseText;
+         }
+     });
+    }
+
+    </script>
 </head>
 <body id="top">
 
@@ -41,6 +70,7 @@
     <div class="inner">
         <p><img src="images/logo.png"></p>
         <h2>UnderCurrent</h2>
+
         <p>
             <nav id="nav">
                 <ul class="icons">

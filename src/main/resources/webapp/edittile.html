@@ -1,0 +1,312 @@
+<!DOCTYPE HTML>
+
+<html>
+<head>
+    <title>UnderCurrent</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta http-equiv="cache-control" content="no-cache, must-revalidate, post-check=0, pre-check=0">
+    <meta http-equiv="expires" content="Sat, 31 Oct 2000 00:00:00 GMT">
+    <meta http-equiv="pragma" content="no-cache">
+    <!--[if lte IE 8]>
+    <script src="js/html5shiv.js"></script>
+    <![endif]-->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/skel.min.js"></script>
+    <script src="js/skel-layers.min.js"></script>
+    <script src="js/init.js"></script>
+    <script src="js/uc.common.js"></script>
+    <noscript>
+        <link rel="stylesheet" href="css/skel.css"/>
+        <link rel="stylesheet" href="css/style.css"/>
+        <link rel="stylesheet" href="css/style-xlarge.css"/>
+    </noscript>
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+
+    <script>
+     $(document).ready(function() {
+         populateEditableFields()
+     });
+
+
+
+    function populateEditableFields() {
+
+    var baseServerUrl = "http://" + location.hostname;
+    var coreCoreUrl = baseServerUrl + ":777/undercurrentcore/core";
+    var blockInternalName = getUrlParameter("internalName");
+    var secretKey = getUrlParameter("secretKey");
+    var internalName = getUrlParameter("internalName");
+
+    $.ajax({
+        url: coreCoreUrl + "?secretKey=" + secretKey,
+        type: "GET",
+        dataType: "json",
+        success: function(responseData) {
+
+            if (responseData.status == true) {
+                if (countBlocks(responseData) == 0) {
+                    document.getElementById("info").innerText = "You do not own any UnderCurrent blocks yet.";
+                    return;
+                }
+
+                var foundBlock = false;
+
+                for (var i = 0; i < countBlocks(responseData); i++) {
+                    var block = getBlockByIndex(responseData, i);
+                    if (block.internalName == internalName) {
+
+                        foundBlock = true;
+                        $("#fieldList").append("<h2>Viewing Block: " + block.name + "</h2");
+
+                        var collections = getBlockCollections(responseData, i);
+                        var nthElement = 0;
+
+                        for (var j = 0; j < collections.length; j++) {
+                            var collection = collections[j];
+                            var editableFields = collection.editableFields;
+
+                            document.getElementById("fieldList").innerHTML =  document.getElementById("fieldList").innerHTML +"<div>";
+                            $("#fieldList").append("<div class='box' display='block' id='collection" + j + "'></div>");
+                            $("#collection" + j).append("<p>" + collection.collectionName + "</p>");
+
+                            for (var k = 0; k < editableFields.length; k++) {
+
+                                nthElement = nthElement + 1;
+
+                                var editableField = editableFields[k];
+                                if (editableField.editorType == "INFO") {
+
+                                    $("#collection" + j).append("<ul id='ul" + nthElement + "'>" +
+                                        "<li><label>" + editableField.displayName + ":</label></li>" +
+                                        "<li><p>" + editableField.fieldValue + "</p></li>" +
+                                        "</ul>");
+                                    $("#ul" + nthElement).addClass("actions");
+
+                                } else {
+                                    if (editableField.editorType == "BOOLEAN") {
+
+                                        var inputId = "input" + nthElement;
+                                        var sliderId = "slider" + nthElement;
+                                        var insetId = "inset" + nthElement;
+                                        var controlId = "control" + nthElement;
+
+                                        $("#collection" + j).append("<ul id='ul" + nthElement + "'>" +
+                                            "<li><label>" + editableField.displayName + "</label></li>" +
+                                            "<li><div onclick='sliderClicked(" + JSON.stringify(sliderId) + ")' id=" + JSON.stringify(sliderId) + "><div id=" + JSON.stringify(insetId) + "><div id=" + JSON.stringify(controlId) + "></div></div></div></li>" +
+                                            "<li><a onclick='postChangesBoolean(" + JSON.stringify(editableField.fieldName) + ", " + JSON.stringify(sliderId) + ")' class='button big special'>Save</a></li>" +
+                                            "</ul>");
+                                        $("#ul" + nthElement).addClass("actions");
+
+                                        if (editableField.fieldValue == true) {
+                                            $("#" + sliderId).addClass("bool-slider true");
+                                        } else {
+                                            $("#" + sliderId).addClass("bool-slider false");
+                                        }
+
+                                        $("#" + insetId).addClass("inset");
+                                        $("#" + controlId).addClass("control");
+                                    }
+
+                                    if (editableField.editorType == "INT") {
+                                        var inputId = "input" + nthElement;
+                                        $("#collection" + j).append("<ul id='ul" + nthElement + "'>" +
+                                            "<li><label>" + editableField.displayName + "</label></li>" +
+                                            "<li><input id=" + JSON.stringify(inputId) + " type='text' value='" + editableField.fieldValue + "'</input></li>" +
+                                            "<li><a onclick='postChanges(" + JSON.stringify(editableField.fieldName) + ", parseInt(document.getElementById(" + JSON.stringify(inputId) + ").value))' class='button big special'>Save</a></li>" +
+                                            "</ul>");
+                                        $("#ul" + k).addClass("actions");
+                                    }
+
+                                    if (editableField.editorType == "FLOAT") {
+                                        var inputId = "input" + nthElement;
+                                        $("#collection" + j).append("<ul id='ul" + nthElement + "'>" +
+                                            "<li><label>" + editableField.displayName + "</label></li>" +
+                                            "<li><input id=" + JSON.stringify(inputId) + " type='text' value='" + editableField.fieldValue + "'</input></li>" +
+                                            "<li><a onclick='postChanges(" + JSON.stringify(editableField.fieldName) + ", parseFloat(document.getElementById(" + JSON.stringify(inputId) + ").value))' class='button big special'>Save</a></li>" +
+                                            "</ul>");
+                                        $("#ul" + k).addClass("actions");
+                                    }
+
+                                    if (editableField.editorType == "DOUBLE") {
+                                        var inputId = "input" + nthElement;
+                                        $("#collection" + j).append("<ul id='ul" + nthElement + "'>" +
+                                            "<li><label>" + editableField.displayName + "</label></li>" +
+                                            "<li><input id=" + JSON.stringify(inputId) + " type='text' value='" + editableField.fieldValue + "'</input></li>" +
+                                            "<li><a onclick='postChanges(" + JSON.stringify(editableField.fieldName) + ", parseFloat(document.getElementById(" + JSON.stringify(inputId) + ").value))' class='button big special'>Save</a></li>" +
+                                            "</ul>");
+                                        $("#ul" + k).addClass("actions");
+                                    }
+
+                                    if (editableField.editorType == "STRING") {
+                                        var inputId = "input" + nthElement;
+                                        $("#collection" + j).append("<ul id='ul" + nthElement + "'>" +
+                                            "<li><label>" + editableField.displayName + "</label></li>" +
+                                            "<li><input id=" + JSON.stringify(inputId) + " type='text' value='" + editableField.fieldValue + "'</input></li>" +
+                                            "<li><a onclick='postChanges(" + JSON.stringify(editableField.fieldName) + ", document.getElementById(" + JSON.stringify(inputId) + ").value)' class='button big special'>Save</a></li>" +
+                                            "</ul>");
+                                        $("#ul" + k).addClass("actions");
+                                    }
+                                }
+                            }
+                           document.getElementById("fieldList").innerHTML =  document.getElementById("fieldList").innerHTML +"</div>";
+                        }
+                    }
+                }
+                if (foundBlock == false) {
+                    document.getElementById("info").innerText = "Block does not exist on the server. Was it removed since the block listing page was last updated?";
+                }
+            } else {
+                document.getElementById("info").innerText = "Server error::" + resolveErrorType(responseData.error_message);
+            }
+        },
+        error: function(xhr, status, error) {
+            document.getElementById("info").innerText = "Error communicating with server: " + status + "::" + xhr.responseText;
+        }
+    });
+}
+
+     function postChangesBoolean(fieldName, sliderId) {
+     var slider = $("#" + sliderId).hasClass("true");
+
+     var baseServerUrl = "http://" + location.hostname;
+     var coreCoreUrl = baseServerUrl + ":777/undercurrentcore/core";
+     var secretKey = getUrlParameter("secretKey");
+     var jsonToPost = JSON.stringify({
+         "data": [{
+             "internalName": getUrlParameter("internalName"),
+             "editedData": [{
+                 "fieldName": fieldName,
+                 "fieldValue": slider
+             }]
+         }]
+     })
+
+     $.ajax({
+         url: coreCoreUrl + "?secretKey=" + secretKey,
+         type: "POST",
+         data: jsonToPost,
+         dataType: "json",
+         cache: false,
+         contentType: false,
+         success: function(responseData) {
+
+             if (responseData.status == true) {
+
+             } else {
+                 document.getElementById("info").innerText = "Could not update field: " + resolveErrorType(responseData.error_message);
+             }
+         },
+         error: function(xhr, status, error) {
+             document.getElementById("info").innerText = "Error communicating with server: " + status + ":" + xhr.responseText;
+         }
+     });
+    }
+
+     function postChanges(fieldName, fieldValue) {
+
+      var baseServerUrl = "http://" + location.hostname;
+      var coreCoreUrl = baseServerUrl + ":777/undercurrentcore/core";
+      var secretKey = getUrlParameter("secretKey");
+      var jsonToPost = JSON.stringify({
+          "data": [{
+              "internalName": getUrlParameter("internalName"),
+              "editedData": [{
+                  "fieldName": fieldName,
+                  "fieldValue": fieldValue
+              }]
+          }]
+      })
+
+      $.ajax({
+          url: coreCoreUrl + "?secretKey=" + secretKey,
+          type: "POST",
+          data: jsonToPost,
+          dataType: "json",
+          cache: false,
+          contentType: false,
+          success: function(responseData) {
+
+              if (responseData.status == true) {
+
+              } else {
+                  document.getElementById("info").innerText = "Could not update field: " + resolveErrorType(responseData.error_message);
+              }
+          },
+          error: function(xhr, status, error) {
+              document.getElementById("info").innerText = "Error communicating with server: " + status + ":" + xhr.responseText;
+          }
+      });
+    }
+
+     function sliderClicked(id) {
+     if ($("#" + id).hasClass("true")) {
+         $("#" + id).removeClass("true").addClass("false");
+     } else {
+         $("#" + id).removeClass("false").addClass("true");
+     }
+    }
+
+  function getBlocks(rawData) {
+      return rawData.data;
+  }
+
+  function countBlocks(rawData) {
+      return rawData.data.length;
+  }
+
+  function getBlockByIndex(rawData, index) {
+      return rawData.data[index];
+  }
+
+  function getBlockCollections(rawData, index) {
+      return rawData.data[index].editableFields[0].collections;
+  }
+
+
+
+    </script>
+</head>
+<body id="top">
+
+<!-- Header -->
+<header id="header" class="skel-layers-fixed">
+    <nav id="nav">
+        <ul>
+            <li><a href="about-undercurrent.html">About UnderCurrent</a></li>
+            <li><a href="right-sidebar.html">Right Sidebar</a></li>
+            <li><a href="no-sidebar.html">No Sidebar</a></li>
+        </ul>
+    </nav>
+</header>
+
+<!-- Banner -->
+<section id="banner">
+    <div class="inner">
+        <p><img src="images/logo.png"></p>
+
+        <p id="info"></p>
+        <ul id="fieldList">
+
+        </ul>
+        <p>&nbsp</p>
+
+        <p>
+            <nav id="nav">
+                <ul class="icons">
+                    <li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li>
+                    <li><a href="#" class="icon fa-facebook"><span class="label">Facebook</span></a></li>
+                    <li><a href="#" class="icon fa-github"><span class="label">GitHub</span></a></li>
+                </ul>
+            </nav>
+        </p>
+        <h6>Page created by the UnderCurrentTeam 2016</h6>
+        <img src="images/logo.png" height="40" width="40">
+    </div>
+</section>
+
+</body>
+</html>
