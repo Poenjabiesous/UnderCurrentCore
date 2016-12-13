@@ -54,13 +54,14 @@ public class UCEventHandler {
 
                 if (registered) {
 
-                    String secretKey = data.getPlayerSecretKey(player.getUniqueID());
+                    String secretKey = data.getPlayerSecretKeyForUUID(player.getUniqueID());
 
                     if (secretKey == null) {
                         event.setCanceled(true);
                         return;
                     }
 
+                    //Check if placed blocks still exist
                     for (UCBlockDTO block : data.getUCPlayerInfo(secretKey).getBlocks()) {
                         if ((DimensionManager.getWorld(block.getDim()).getTileEntity(block.getxCoord(), block.getyCoord(), block.getzCoord()) instanceof IUCTile)) {
                             data.removeBlockFromPlayer(secretKey, block);
@@ -68,7 +69,7 @@ public class UCEventHandler {
                     }
                 }
 
-                boolean registration = data.addPlayer(RandomStringUtils.randomAlphanumeric(6), player.getUniqueID());
+                boolean registration = data.addPlayer(RandomStringUtils.randomAlphanumeric(6), player.getUniqueID(), player.getDisplayName());
 
                 if (registration) {
                     player.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.AQUA +
@@ -88,7 +89,7 @@ public class UCEventHandler {
             if (event.player instanceof EntityPlayer && event.placedBlock instanceof BlockContainer && ((BlockContainer) event.placedBlock).createNewTileEntity(event.player.worldObj, 0) instanceof IUCTile) {
 
                 UCPlayersWorldData data = (UCPlayersWorldData) DimensionManager.getWorld(0).perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
-                String secretKey = data.getPlayerSecretKey(event.player.getUniqueID());
+                String secretKey = data.getPlayerSecretKeyForUUID(event.player.getUniqueID());
 
                 if (secretKey == null) {
                     event.setCanceled(true);
@@ -121,7 +122,7 @@ public class UCEventHandler {
             if (event.getPlayer() instanceof EntityPlayer && event.block instanceof BlockContainer && ((BlockContainer) event.block).createNewTileEntity(event.getPlayer().worldObj, 0) instanceof IUCTile) {
 
                 UCPlayersWorldData data = (UCPlayersWorldData) DimensionManager.getWorld(0).perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
-                String secretKey = data.getPlayerSecretKey(event.getPlayer().getUniqueID());
+                String secretKey = data.getPlayerSecretKeyForUUID(event.getPlayer().getUniqueID());
 
                 if (secretKey == null && !event.getPlayer().capabilities.isCreativeMode) {
                     event.setCanceled(true);
@@ -174,7 +175,7 @@ public class UCEventHandler {
         float dy = y - playerY;
         float dz = z - playerZ;
         float distance = (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
-        float multiplier = distance / 120f; //mobs only render ~120 blocks away
+        float multiplier = distance / 120f;
         float scale = 0.9f * multiplier;
 
         GL11.glColor4f(1f, 1f, 1f, 0.5f);
@@ -205,10 +206,10 @@ public class UCEventHandler {
             tessellator.startDrawingQuads();
             int stringMiddle = textWidth / 2;
             tessellator.setColorRGBA_F(0.0F, 0.0F, 0.0F, 0.5F);
-            tessellator.addVertex(-stringMiddle - 1, -1 + 0, 0.0D);
+            tessellator.addVertex(-stringMiddle - 1, -1, 0.0D);
             tessellator.addVertex(-stringMiddle - 1, 8 + lineHeight * text.length - lineHeight, 0.0D);
             tessellator.addVertex(stringMiddle + 1, 8 + lineHeight * text.length - lineHeight, 0.0D);
-            tessellator.addVertex(stringMiddle + 1, -1 + 0, 0.0D);
+            tessellator.addVertex(stringMiddle + 1, -1, 0.0D);
             tessellator.draw();
             GL11.glEnable(GL11.GL_TEXTURE_2D);
         }

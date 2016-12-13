@@ -709,16 +709,15 @@
 		cursor: pointer;
 		display: inline-block;
 		font-weight: 300;
-		text-transform: uppercase;
 		letter-spacing: 0.125em;
 		font-size: 0.9em;
 		height: 2.85em;
 		line-height: 2.85em;
-		padding: 0 1.75em;
+		padding: 10px 10px 10px 10px;
 		text-align: center;
 		text-decoration: none;
 		white-space: nowrap;
-		text-indent: 0.25em;
+
 	}
 
 		input[type="submit"]:hover,
@@ -991,13 +990,9 @@
 
             		background-color: #666666;
             		background-image: url("../images/banner.jpg");
-            		-webkit-background-size: cover;
-                       -moz-background-size: cover;
-                         -o-background-size: cover;
-                            background-size: cover;
 
             		background-position: center center;
-            		background-repeat: no-repeat;
+            		background-repeat: repeat;
             		background-attachment: local;
             		color: #d8d8d8;
             		padding: 14em 0;

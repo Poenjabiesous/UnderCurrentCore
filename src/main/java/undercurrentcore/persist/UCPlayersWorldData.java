@@ -3,9 +3,13 @@ package undercurrentcore.persist;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.WorldSavedData;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.util.Constants;
 
+import javax.crypto.Cipher;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -17,7 +21,7 @@ public class UCPlayersWorldData extends WorldSavedData {
     private NBTTagList data = new NBTTagList();
     public static String GLOBAL_TAG = "undercurrentdata";
     public static String REGISTERED_PLAYERS = "ucRegisteredPlayers";
-    public static String SECRET_KEY = "ucRegisteredPlayers";
+    public static String SECRET_KEY = "secretKey";
     public static String BLOCKS = "blocks";
     public static String INTERNAL_NAME = "internalName";
     public static String NAME = "name";
@@ -26,6 +30,8 @@ public class UCPlayersWorldData extends WorldSavedData {
     public static String Z_COORD = "zCoord";
     public static String DIM = "dim";
     public static String UUID = "uuid";
+    public static String PLAYER_NAME = "displayName";
+    public static String REGISTRATION_DATE = "registrationDate";
 
     public UCPlayersWorldData(String tagName) {
         super(tagName);
@@ -41,7 +47,11 @@ public class UCPlayersWorldData extends WorldSavedData {
         compound.setTag(REGISTERED_PLAYERS, data);
     }
 
-    public boolean addPlayer(String secretKey, UUID uuid) {
+    public static UCPlayersWorldData get() {
+        return (UCPlayersWorldData) DimensionManager.getWorld(0).perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
+    }
+
+    public boolean addPlayer(String secretKey, UUID uuid, String playerName) {
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
             if (player.getString(UUID).equals(uuid.toString())) {
@@ -52,6 +62,8 @@ public class UCPlayersWorldData extends WorldSavedData {
         NBTTagCompound newPlayer = new NBTTagCompound();
         newPlayer.setString(UUID, uuid.toString());
         newPlayer.setString(SECRET_KEY, secretKey);
+        newPlayer.setString(PLAYER_NAME, playerName);
+        newPlayer.setString(REGISTRATION_DATE, new Date().toString());
         NBTTagList blocks = new NBTTagList();
         newPlayer.setTag(BLOCKS, blocks);
         data.appendTag(newPlayer);
@@ -59,17 +71,17 @@ public class UCPlayersWorldData extends WorldSavedData {
         return true;
     }
 
-    public boolean validatePlayerSecretKey(String secretKey) {
+    public boolean validateLogin(String secretKey, String playerName) {
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
-            if (player.getString(SECRET_KEY).equals(secretKey)) {
+            if (player.getString(PLAYER_NAME).equals(playerName) && player.getString(SECRET_KEY).equals(secretKey)) {
                 return true;
             }
         }
         return false;
     }
 
-    public String getPlayerSecretKey(UUID uuid) {
+    public String getPlayerSecretKeyForUUID(UUID uuid) {
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
             if (player.getString(UUID).equals(uuid.toString())) {
@@ -83,16 +95,6 @@ public class UCPlayersWorldData extends WorldSavedData {
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
             if (player.getString(UUID).equals(uuid)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean checkPlayerOnSecretKey(String secretKey) {
-        for (int i = 0; i < data.tagCount(); i++) {
-            NBTTagCompound player = data.getCompoundTagAt(i);
-            if (player.getString(SECRET_KEY).equals(secretKey)) {
                 return true;
             }
         }
@@ -244,15 +246,24 @@ public class UCPlayersWorldData extends WorldSavedData {
         return false;
     }
 
-    public UCPlayerDTO getUCPlayerInfo(String secretKey) {
+    public UCPlayerDTO getPlayerInfo(String secretKey) {
         for (int i = 0; i < data.tagCount(); i++) {
             NBTTagCompound player = data.getCompoundTagAt(i);
             if (player.getString(SECRET_KEY).equals(secretKey)) {
-                UCPlayerDTO UCPlayerDTO = new UCPlayerDTO();
-                UCPlayerDTO.setUuid(player.getString("uuid"));
+                UCPlayerDTO UCPlayerDTO = new UCPlayerDTO(player.getString(UUID), player.getString(PLAYER_NAME), player.getString(REGISTRATION_DATE));
+                return UCPlayerDTO;
+            }
+        }
+        return null;
+    }
+
+    public List<UCBlockDTO> getPlayerBlocks(String secretKey) {
+        for (int i = 0; i < data.tagCount(); i++) {
+            NBTTagCompound player = data.getCompoundTagAt(i);
+            if (player.getString(SECRET_KEY).equals(secretKey)) {
 
                 ArrayList<UCBlockDTO> blocks = new ArrayList<UCBlockDTO>();
-                NBTTagList blocksNBT = player.getTagList("blocks", Constants.NBT.TAG_COMPOUND);
+                NBTTagList blocksNBT = player.getTagList(BLOCKS, Constants.NBT.TAG_COMPOUND);
 
                 for (int j = 0; j < blocksNBT.tagCount(); j++) {
                     NBTTagCompound block = blocksNBT.getCompoundTagAt(j);
@@ -260,8 +271,7 @@ public class UCPlayersWorldData extends WorldSavedData {
                     blocks.add(newBlock);
                 }
 
-                UCPlayerDTO.setBlocks(blocks);
-                return UCPlayerDTO;
+                return blocks;
             }
         }
         return null;

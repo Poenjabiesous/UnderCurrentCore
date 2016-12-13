@@ -8,8 +8,8 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.eclipse.jetty.webapp.WebAppContext;
 import undercurrentcore.persist.UCConfiguration;
-import undercurrentcore.server.servletHandlers.UCAuthImplServlet;
-import undercurrentcore.server.servletHandlers.UCCoreImplServlet;
+import undercurrentcore.server.servletHandlers.UCPlayerImplServlet;
+import undercurrentcore.server.servletHandlers.UCTileImplServlet;
 
 import javax.servlet.DispatcherType;
 import java.util.EnumSet;
@@ -31,8 +31,8 @@ public class ServerWrapper {
 
         ServletContextHandler contextApi = new ServletContextHandler(ServletContextHandler.SESSIONS);
         contextApi.setContextPath("/undercurrentcore");
-        contextApi.addServlet(new ServletHolder(new UCCoreImplServlet()), "/core");
-        contextApi.addServlet(new ServletHolder(new UCAuthImplServlet()), "/auth");
+        contextApi.addServlet(new ServletHolder(new UCTileImplServlet()), "/core");
+        contextApi.addServlet(new ServletHolder(new UCPlayerImplServlet()), "/auth");
         FilterHolder corsApi = contextApi.addFilter(CrossOriginFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
         corsApi.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, "*");
         corsApi.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*");

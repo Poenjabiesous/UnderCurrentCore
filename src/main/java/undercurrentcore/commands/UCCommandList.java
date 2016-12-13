@@ -13,6 +13,7 @@ import undercurrentcore.persist.UCPlayerDTO;
 import undercurrentcore.persist.UCPlayersWorldData;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class UCCommandList extends CommandBase {
     @Override
@@ -35,16 +36,15 @@ public class UCCommandList extends CommandBase {
 
                 UCPlayersWorldData data = (UCPlayersWorldData) DimensionManager.getWorld(0).perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
 
-                String secretKey = data.getPlayerSecretKey(player.getUniqueID());
+                String secretKey = data.getPlayerSecretKeyForUUID(player.getUniqueID());
 
                 if (secretKey == null) {
                     return;
                 }
 
-                UCPlayerDTO playerDto = data.getUCPlayerInfo(secretKey);
+                List<UCBlockDTO> blocks = data.getPlayerBlocks(secretKey);
 
-                if(playerDto.getBlocks().size() < 1)
-                {
+                if (blocks.size() < 1) {
                     sender.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA +
                             "UnderCurrent: " +
                             EnumChatFormatting.WHITE +
@@ -52,7 +52,7 @@ public class UCCommandList extends CommandBase {
                     return;
                 }
 
-                for (UCBlockDTO block : playerDto.getBlocks()) {
+                for (UCBlockDTO block : blocks) {
 
                     sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GOLD +
                             block.getName() +

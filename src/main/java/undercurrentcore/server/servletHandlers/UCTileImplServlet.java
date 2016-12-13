@@ -7,16 +7,13 @@ import api.undercurrent.iface.editorTypes.EditorType;
 import com.google.common.base.Throwables;
 import com.google.common.io.CharStreams;
 import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.DimensionManager;
-import scala.reflect.internal.Trees;
 import undercurrentcore.persist.UCBlockDTO;
-import undercurrentcore.persist.UCPlayersWorldData;
 import undercurrentcore.server.RequestReturnObject;
 import undercurrentcore.server.constants.ResponseTypes;
+import undercurrentcore.util.BlockUtils;
+import undercurrentcore.util.PlayerUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -25,7 +22,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -33,12 +29,12 @@ import java.util.logging.Logger;
  * Created by Niel Verster on 5/26/2015.
  */
 
-public class UCCoreImplServlet extends HttpServlet {
+public class UCTileImplServlet extends HttpServlet {
 
     Gson gson;
     public static Logger logger = Logger.getLogger("UnderCurrentCore");
 
-    public UCCoreImplServlet() {
+    public UCTileImplServlet() {
         gson = new Gson();
     }
 
@@ -48,54 +44,39 @@ public class UCCoreImplServlet extends HttpServlet {
         resp.setContentType("text/html;charset=utf-8");
         resp.setStatus(HttpServletResponse.SC_OK);
 
-
         String secretKey = req.getParameter("secretKey");
+        String playerName = req.getParameter("playerName");
 
-        // Request checks
-        if (secretKey == null || secretKey.equals("") || secretKey.isEmpty()) {
-            RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.EMPTY_REQUEST_PARAMETER.toString());
-            resp.getWriter().write(gson.toJson(rro));
+        if (!PlayerUtils.validateLoginWithBooleanResponse(playerName, secretKey)) {
+            resp.getWriter().write(gson.toJson(new RequestReturnObject(false, ResponseTypes.USER_NOT_REGISTERED.toString())));
             return;
         }
 
-        UCPlayersWorldData data = (UCPlayersWorldData) DimensionManager.getWorld(0).perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
+        List<UCBlockDTO> blocks = PlayerUtils.getPlayerBlocks(playerName, secretKey);
+        List<JsonObject> blocksToReturn = new ArrayList<>();
 
-        if (!data.checkPlayerOnSecretKey(secretKey)) {
-            RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.USER_NOT_REGISTERED.toString());
-            resp.getWriter().write(gson.toJson(rro));
-            return;
-        }
-
-        List<UCBlockDTO> blocks = data.getUCPlayerInfo(secretKey).getBlocks();
-
-        if (blocks == null) {
-            RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.CANT_RETRIEVE_USER_INFO.toString());
-            resp.getWriter().write(gson.toJson(rro));
-            return;
-        }
-
-        JsonArray blocksToReturn = new JsonArray();
         try {
             for (UCBlockDTO block : blocks) {
-                JsonObject blockObject = new JsonObject();
-                JsonArray editableFields = new JsonArray();
-                blockObject.addProperty("internalName", block.getInternalName());
-                blockObject.addProperty("name", block.getName());
-                blockObject.addProperty("xCoord", block.getxCoord());
-                blockObject.addProperty("yCoord", block.getyCoord());
-                blockObject.addProperty("zCoord", block.getzCoord());
-                blockObject.addProperty("dim", block.getDim());
-                blockObject.addProperty("dimName", DimensionManager.getProvider(block.getDim()).getDimensionName());
-                editableFields.add(gson.toJsonTree(block.getInstance().getTileDefinition()));
-                blockObject.add("editableFields", editableFields);
-                blocksToReturn.add(blockObject);
+                JsonObject blockOrdinal = new JsonObject();
+                JsonObject generalBlockInfo = new JsonObject();
+
+                generalBlockInfo.addProperty("internalName", block.getInternalName());
+                generalBlockInfo.addProperty("name", block.getName());
+                generalBlockInfo.addProperty("xCoord", block.getxCoord());
+                generalBlockInfo.addProperty("yCoord", block.getyCoord());
+                generalBlockInfo.addProperty("zCoord", block.getzCoord());
+                generalBlockInfo.addProperty("dim", block.getDim());
+                generalBlockInfo.addProperty("dimName", DimensionManager.getProvider(block.getDim()).getDimensionName());
+                blockOrdinal.add("generalBlockInfo", generalBlockInfo);
+                blockOrdinal.add("editableFields", gson.toJsonTree(block.getInstance().getTileDefinition()));
+                blocksToReturn.add(blockOrdinal);
             }
-            RequestReturnObject rro = new RequestReturnObject(true, blocksToReturn);
+            RequestReturnObject rro = new RequestReturnObject(true, gson.toJsonTree(blocksToReturn));
             resp.getWriter().write(gson.toJson(rro));
         } catch (Exception e) {
             RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.SERVER_ERROR.toString() + "::" + e.getMessage());
             resp.getWriter().write(gson.toJson(rro));
-            logger.severe(Throwables.getStackTraceAsString(e));
+            logger.warning(Throwables.getStackTraceAsString(e));
         }
 
     }
@@ -109,19 +90,10 @@ public class UCCoreImplServlet extends HttpServlet {
         Gson gson = new Gson();
 
         String secretKey = req.getParameter("secretKey");
+        String playerName = req.getParameter("playerName");
 
-        // Request checks
-        if (secretKey == null || secretKey.equals("") || secretKey.isEmpty()) {
-            RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.EMPTY_REQUEST_PARAMETER.toString());
-            resp.getWriter().write(gson.toJson(rro));
-            return;
-        }
-
-        UCPlayersWorldData worldData = (UCPlayersWorldData) DimensionManager.getWorld(0).perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
-
-        if (!worldData.checkPlayerOnSecretKey(secretKey)) {
-            RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.USER_NOT_REGISTERED.toString());
-            resp.getWriter().write(gson.toJson(rro));
+        if (!PlayerUtils.validateLoginWithBooleanResponse(playerName, secretKey)) {
+            resp.getWriter().write(gson.toJson(new RequestReturnObject(false, ResponseTypes.USER_NOT_REGISTERED.toString())));
             return;
         }
 
@@ -137,15 +109,15 @@ public class UCCoreImplServlet extends HttpServlet {
         JsonArray data = obj.getAsJsonArray("data");
 
         for (int i = 0; i < data.size(); i++) {
-            JsonObject objectIteratable = data.get(i).getAsJsonObject();
+            JsonObject objectJson = data.get(i).getAsJsonObject();
 
-            if (!objectIteratable.has("internalName")) {
-                RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.MISSING_BODY_MEMBER.toString() + "::internalName");
+            if (!objectJson.has("internalName")) {
+                RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.MISSING_BODY_MEMBER.toString() + "::internalName ON ITERATION " + i);
                 resp.getWriter().write(gson.toJson(rro));
                 return;
             }
 
-            UCBlockDTO blockToUpdate = worldData.getBlockByInternalName(secretKey, objectIteratable.get("internalName").getAsString());
+            UCBlockDTO blockToUpdate = BlockUtils.getBlockFromWorldDataWithInternalName(secretKey, objectJson.get("internalName").getAsString());
 
             if (blockToUpdate == null) {
                 RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.NO_BLOCK_FOUND_FOR_INTERNAL_NAME.toString());
@@ -153,10 +125,8 @@ public class UCCoreImplServlet extends HttpServlet {
                 return;
             }
 
-            TileEntity te = DimensionManager.getWorld(blockToUpdate.getDim()).getTileEntity(blockToUpdate.getxCoord(), blockToUpdate.getyCoord(), blockToUpdate.getzCoord());
+            TileEntity te = BlockUtils.getBlockTileFromCoords(blockToUpdate.getxCoord(), blockToUpdate.getyCoord(), blockToUpdate.getzCoord(), blockToUpdate.getDim());
 
-            ArrayList<Field> fields = new ArrayList<Field>();
-            addDeclaredAndInheritedFields(te.getClass(), fields);
 
             if (te == null) {
                 RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.WORLD_TE_DOES_NOT_EXIST.toString());
@@ -170,7 +140,6 @@ public class UCCoreImplServlet extends HttpServlet {
                 return;
             }
 
-            HashSet<String> editableFields = new HashSet<String>();
             UCTileDefinition tileDefinition;
 
             try {
@@ -187,14 +156,17 @@ public class UCCoreImplServlet extends HttpServlet {
                 return;
             }
 
+            ArrayList<Field> fields = new ArrayList<>();
+            addDeclaredAndInheritedFields(te.getClass(), fields);
+            HashSet<String> editableFields = new HashSet<>();
 
-            if (!objectIteratable.has("editedData")) {
+            if (!objectJson.has("editedData")) {
                 RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.MISSING_BODY_MEMBER.toString() + "::editedData");
                 resp.getWriter().write(gson.toJson(rro));
                 return;
             }
 
-            JsonArray collections = objectIteratable.get("editedData").getAsJsonArray();
+            JsonArray collections = objectJson.get("editedData").getAsJsonArray();
             for (int j = 0; j < collections.size(); j++) {
                 JsonObject currentIteration = collections.get(j).getAsJsonObject();
                 try {
@@ -269,14 +241,14 @@ public class UCCoreImplServlet extends HttpServlet {
 
                 } catch (Exception e) {
                     System.out.println(Throwables.getStackTraceAsString(e));
-                    RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.CANT_USE_FIELD.toString() + ": " + currentIteration.get("fieldName").getAsString());
+                    RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.SERVER_ERROR.toString() + ": " + Throwables.getStackTraceAsString(e));
                     resp.getWriter().write(gson.toJson(rro));
                     return;
                 }
             }
             te.getWorldObj().markBlockForUpdate(blockToUpdate.getxCoord(), blockToUpdate.getyCoord(), blockToUpdate.getzCoord());
         }
-        RequestReturnObject rro = new RequestReturnObject(true);
+        RequestReturnObject rro = new RequestReturnObject(true, ResponseTypes.TE_UPDATE_SUCCESS.toString());
         resp.getWriter().write(gson.toJson(rro));
     }
 

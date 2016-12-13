@@ -6,6 +6,7 @@ package undercurrentcore.server.constants;
 public enum ResponseTypes {
 
     EMPTY_REQUEST_PARAMETER,
+    LOGIN_SUCCESSFUL,
     SERVER_ERROR,
     WORLD_TE_DOES_NOT_EXIST,
     USER_NOT_REGISTERED,
@@ -18,5 +19,6 @@ public enum ResponseTypes {
     TE_NOT_IUCTILE,
     UCTILEDEF_IS_NULL,
     SPECIFIED_EDITABLEFIELD_NOT_EDITABLE,
-    VALUE_NOT_VALID_FOR_FIELD
+    VALUE_NOT_VALID_FOR_FIELD,
+    TE_UPDATE_SUCCESS
 }

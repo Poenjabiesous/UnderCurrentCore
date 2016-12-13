@@ -32,7 +32,7 @@ public class RequestReturnObject {
     }
 
 
-    public boolean isStatus() {
+    public boolean getStatus() {
         return status;
     }
 
@@ -43,4 +43,6 @@ public class RequestReturnObject {
     public String getError_message() {
         return error_message;
     }
+
+
 }

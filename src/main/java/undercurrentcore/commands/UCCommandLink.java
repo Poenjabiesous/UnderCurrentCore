@@ -41,7 +41,7 @@ public class UCCommandLink extends CommandBase {
                             EnumChatFormatting.WHITE +
                             StatCollector.translateToLocal("uclink.info.1") +
                             ": " +
-                            data.getPlayerSecretKey(player.getUniqueID()) +
+                            data.getPlayerSecretKeyForUUID(player.getUniqueID()) +
                             EnumChatFormatting.DARK_RED +
                             " (" +
                             StatCollector.translateToLocal("uclink.info.2") +

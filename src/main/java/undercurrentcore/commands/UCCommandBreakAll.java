@@ -34,17 +34,15 @@ public class UCCommandBreakAll extends CommandBase {
 
                 UCPlayersWorldData data = (UCPlayersWorldData) DimensionManager.getWorld(0).perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
 
-                String secretKey = data.getPlayerSecretKey(player.getUniqueID());
+                String secretKey = data.getPlayerSecretKeyForUUID(player.getUniqueID());
 
                 if (secretKey == null) {
                     return;
                 }
 
-                UCPlayerDTO playerDto = data.getUCPlayerInfo(secretKey);
-
                 int amountDropped = 0;
 
-                for (UCBlockDTO block : playerDto.getBlocks()) {
+                for (UCBlockDTO block : data.getPlayerBlocks(secretKey)) {
 
                     if (DimensionManager.getProvider(block.getDim()).worldObj.getTileEntity(block.getxCoord(), block.getyCoord(), block.getzCoord()) instanceof IUCTile) {
                         DimensionManager.getProvider(block.getDim()).worldObj.func_147480_a(block.getxCoord(), block.getyCoord(), block.getzCoord(), true);

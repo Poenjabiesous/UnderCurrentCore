@@ -71,7 +71,7 @@ public class UCCommandName extends CommandBase {
                     if (mop != null && mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
                         if (player.worldObj.getTileEntity(mop.blockX, mop.blockY, mop.blockZ) instanceof IUCTile) {
                             UCBlockDTO block = new UCBlockDTO(mop.blockX, mop.blockY, mop.blockZ, player.worldObj.provider.dimensionId, params[0].toString(), "");
-                            String secretKey = data.getPlayerSecretKey(player.getUniqueID());
+                            String secretKey = data.getPlayerSecretKeyForUUID(player.getUniqueID());
 
                             if (secretKey == null) {
                                 return;

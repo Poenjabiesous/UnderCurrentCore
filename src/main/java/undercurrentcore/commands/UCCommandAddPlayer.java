@@ -43,7 +43,7 @@ public class UCCommandAddPlayer extends CommandBase {
                     return;
                 }
 
-                UCPlayersWorldData data = (UCPlayersWorldData) DimensionManager.getWorld(0).perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
+                UCPlayersWorldData data = UCPlayersWorldData.get();
 
                 if (data != null) {
 
@@ -55,7 +55,7 @@ public class UCCommandAddPlayer extends CommandBase {
 
                     if (mop != null && mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
                         if (player.worldObj.getTileEntity(mop.blockX, mop.blockY, mop.blockZ) instanceof IUCTile) {
-                            String secretKey = data.getPlayerSecretKey(player.getUniqueID());
+                            String secretKey = data.getPlayerSecretKeyForUUID(player.getUniqueID());
 
                             if (secretKey == null) {
                                 return;
@@ -75,7 +75,7 @@ public class UCCommandAddPlayer extends CommandBase {
                                     return;
                                 }
 
-                                String secretKeyPlayerAdd = data.getPlayerSecretKey(playerAddUUID);
+                                String secretKeyPlayerAdd = data.getPlayerSecretKeyForUUID(playerAddUUID);
 
                                 if (secretKeyPlayerAdd == null) {
                                     if (playerAddUUID == null) {

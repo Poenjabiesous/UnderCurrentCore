@@ -8,25 +8,24 @@ import java.util.List;
 public class UCPlayerDTO {
 
     private String uuid;
-    private List<UCBlockDTO> blocks;
+    private String playerName;
+    private String registrationDate;
+
+    public UCPlayerDTO(String uuid, String playerName, String registrationDate) {
+        this.uuid = uuid;
+        this.playerName = playerName;
+        this.registrationDate = registrationDate;
+    }
 
     public String getUuid() {
-
         return uuid;
     }
 
-    public void setUuid(String uuid) {
-
-        this.uuid = uuid;
+    public String getPlayerName() {
+        return playerName;
     }
 
-    public List<UCBlockDTO> getBlocks() {
-
-        return blocks;
-    }
-
-    public void setBlocks(List<UCBlockDTO> blocks) {
-
-        this.blocks = blocks;
+    public String getRegistrationDate() {
+        return registrationDate;
     }
 }
