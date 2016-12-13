@@ -1,9 +1,7 @@
 package undercurrentcore.server.servletHandlers;
 
 import api.undercurrent.iface.IUCTile;
-import api.undercurrent.iface.UCCollection;
-import api.undercurrent.iface.UCTileDefinition;
-import api.undercurrent.iface.editorTypes.EditorType;
+import api.undercurrent.iface.UCEditorType;
 import com.google.common.base.Throwables;
 import com.google.common.io.CharStreams;
 import com.google.gson.*;
@@ -29,12 +27,12 @@ import java.util.logging.Logger;
  * Created by Niel Verster on 5/26/2015.
  */
 
-public class UCTileImplServlet extends HttpServlet {
+public class UCTileEditorImplServlet extends HttpServlet {
 
     Gson gson;
     public static Logger logger = Logger.getLogger("UnderCurrentCore");
 
-    public UCTileImplServlet() {
+    public UCTileEditorImplServlet() {
         gson = new Gson();
     }
 
@@ -68,7 +66,13 @@ public class UCTileImplServlet extends HttpServlet {
                 generalBlockInfo.addProperty("dim", block.getDim());
                 generalBlockInfo.addProperty("dimName", DimensionManager.getProvider(block.getDim()).getDimensionName());
                 blockOrdinal.add("generalBlockInfo", generalBlockInfo);
-                blockOrdinal.add("editableFields", gson.toJsonTree(block.getInstance().getTileDefinition()));
+
+                if (block.getInstance().getEditableFields() == null) {
+                    blockOrdinal.add("editableFields", gson.toJsonTree(new ArrayList<>()));
+                } else {
+                    blockOrdinal.add("editableFields", gson.toJsonTree(block.getInstance().getEditableFields()));
+                }
+
                 blocksToReturn.add(blockOrdinal);
             }
             RequestReturnObject rro = new RequestReturnObject(true, gson.toJsonTree(blocksToReturn));
@@ -140,25 +144,25 @@ public class UCTileImplServlet extends HttpServlet {
                 return;
             }
 
-            UCTileDefinition tileDefinition;
+            ArrayList<UCEditorType> editableFields;
 
             try {
-                tileDefinition = ((IUCTile) te).getTileDefinition();
+                editableFields = ((IUCTile) te).getEditableFields();
             } catch (Exception e) {
-                RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.ERROR_GETTING_TILE_UCTILEDEF.toString());
+                RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.ERROR_GETTING_TILE_EDITABLEFIELDS.toString() + ": " + Throwables.getStackTraceAsString(e));
                 resp.getWriter().write(gson.toJson(rro));
                 return;
             }
 
-            if (tileDefinition == null) {
-                RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.UCTILEDEF_IS_NULL.toString());
+            if (editableFields == null) {
+                RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.UCTILE_EDITABLEFIELDS_IS_NULL.toString());
                 resp.getWriter().write(gson.toJson(rro));
                 return;
             }
 
             ArrayList<Field> fields = new ArrayList<>();
             addDeclaredAndInheritedFields(te.getClass(), fields);
-            HashSet<String> editableFields = new HashSet<>();
+            HashSet<String> editableFieldsHashed = new HashSet<>();
 
             if (!objectJson.has("editedData")) {
                 RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.MISSING_BODY_MEMBER.toString() + "::editedData");
@@ -183,19 +187,18 @@ public class UCTileImplServlet extends HttpServlet {
                         return;
                     }
 
-                    for (UCCollection collection : tileDefinition.getCollections()) {
-                        for (EditorType editorType : collection.getEditableFields()) {
-                            if (editorType.getFieldName().equals(currentIteration.get("fieldName").getAsString())) {
-                                if (editorType.validateValue(currentIteration.get("fieldValue"))) {
-                                    editableFields.add(currentIteration.get("fieldName").getAsString());
-                                } else {
-                                    RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.VALUE_NOT_VALID_FOR_FIELD.toString() + "::" + currentIteration.get("fieldName").getAsString());
-                                    resp.getWriter().write(gson.toJson(rro));
-                                    return;
-                                }
+                    for (UCEditorType UCEditorType : editableFields) {
+                        if (UCEditorType.getFieldName().equals(currentIteration.get("fieldName").getAsString())) {
+                            if (UCEditorType.validateValue(currentIteration.get("fieldValue"))) {
+                                editableFieldsHashed.add(currentIteration.get("fieldName").getAsString());
+                            } else {
+                                RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.VALUE_NOT_VALID_FOR_FIELD.toString() + "::" + currentIteration.get("fieldName").getAsString());
+                                resp.getWriter().write(gson.toJson(rro));
+                                return;
                             }
                         }
                     }
+
 
                     if (!editableFields.contains(currentIteration.get("fieldName").getAsString())) {
                         RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.SPECIFIED_EDITABLEFIELD_NOT_EDITABLE.toString() + "::" + currentIteration.get("fieldName").getAsString());

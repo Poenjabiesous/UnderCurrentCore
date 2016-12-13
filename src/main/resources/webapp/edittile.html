@@ -78,7 +78,7 @@
                                 nthElement = nthElement + 1;
 
                                 var editableField = editableFields[k];
-                                if (editableField.editorType == "INFO") {
+                                if (editableField.UCEditorType == "INFO") {
 
                                     $("#collection" + j).append("<ul id='ul" + nthElement + "'>" +
                                         "<li><label>" + editableField.displayName + ":</label></li>" +
@@ -87,7 +87,7 @@
                                     $("#ul" + nthElement).addClass("actions");
 
                                 } else {
-                                    if (editableField.editorType == "BOOLEAN") {
+                                    if (editableField.UCEditorType == "BOOLEAN") {
 
                                         var inputId = "input" + nthElement;
                                         var sliderId = "slider" + nthElement;
@@ -111,7 +111,7 @@
                                         $("#" + controlId).addClass("control");
                                     }
 
-                                    if (editableField.editorType == "INT") {
+                                    if (editableField.UCEditorType == "INT") {
                                         var inputId = "input" + nthElement;
                                         $("#collection" + j).append("<ul id='ul" + nthElement + "'>" +
                                             "<li><label>" + editableField.displayName + "</label></li>" +
@@ -121,7 +121,7 @@
                                         $("#ul" + k).addClass("actions");
                                     }
 
-                                    if (editableField.editorType == "FLOAT") {
+                                    if (editableField.UCEditorType == "FLOAT") {
                                         var inputId = "input" + nthElement;
                                         $("#collection" + j).append("<ul id='ul" + nthElement + "'>" +
                                             "<li><label>" + editableField.displayName + "</label></li>" +
@@ -131,7 +131,7 @@
                                         $("#ul" + k).addClass("actions");
                                     }
 
-                                    if (editableField.editorType == "DOUBLE") {
+                                    if (editableField.UCEditorType == "DOUBLE") {
                                         var inputId = "input" + nthElement;
                                         $("#collection" + j).append("<ul id='ul" + nthElement + "'>" +
                                             "<li><label>" + editableField.displayName + "</label></li>" +
@@ -141,7 +141,7 @@
                                         $("#ul" + k).addClass("actions");
                                     }
 
-                                    if (editableField.editorType == "STRING") {
+                                    if (editableField.UCEditorType == "STRING") {
                                         var inputId = "input" + nthElement;
                                         $("#collection" + j).append("<ul id='ul" + nthElement + "'>" +
                                             "<li><label>" + editableField.displayName + "</label></li>" +

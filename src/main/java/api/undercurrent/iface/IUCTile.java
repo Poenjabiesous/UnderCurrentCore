@@ -1,7 +1,14 @@
 package api.undercurrent.iface;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public interface IUCTile {
 
-    UCTileDefinition getTileDefinition() throws Exception;
+    ArrayList<UCEditorType> getEditableFields() throws Exception;
+
+    HashMap<String, UCCustomInvokable> getCustomInvokables() throws Exception;
+
+    ArrayList<UCNotification> getNotifiers() throws Exception;
 
 }

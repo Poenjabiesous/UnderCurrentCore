@@ -1,15 +1,18 @@
 package api.undercurrent.iface.editorTypes;
 
-import java.lang.Float;
+import api.undercurrent.iface.UCEditorType;
 
-public class FloatEditorType extends EditorType {
+/**
+ * Created by Niel on 10/16/2015.
+ */
+public class DoubleUCEditorType extends UCEditorType {
 
     private int fieldPrecision;
     private double maxValue;
     private double minValue;
 
-    public FloatEditorType(String fieldName, float fieldValue, String displayName, String displayDescription, int fieldPrecision, float maxValue, float minValue) throws Exception {
-        super(EditorTypes.FLOAT);
+    public DoubleUCEditorType(String fieldName, double fieldValue, String displayName, String displayDescription, int fieldPrecision, double maxValue, double minValue, String editorGroup) throws Exception {
+        super(EditorTypes.DOUBLE, editorGroup);
         this.fieldName = fieldName;
         this.fieldValue = fieldValue;
         this.displayName = displayName;
@@ -24,7 +27,7 @@ public class FloatEditorType extends EditorType {
     }
 
     public Object getFieldValue() {
-        return (Float) fieldValue;
+        return (Double) fieldValue;
     }
 
     public String getDisplayName() {
@@ -50,7 +53,7 @@ public class FloatEditorType extends EditorType {
     @Override
     public boolean validateValue(Object obj) throws Exception {
         try {
-            double objcast = Float.valueOf(String.valueOf(obj));
+            double objcast = Double.valueOf(String.valueOf(obj));
 
             if (objcast > getMaxValue()) {
                 return false;

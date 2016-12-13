@@ -1,38 +1,24 @@
 package undercurrentcore;
 
 import api.undercurrent.iface.IUCTile;
-import api.undercurrent.iface.editorTypes.EditorType;
-import cpw.mods.fml.common.eventhandler.EventPriority;
-import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.*;
-import net.minecraftforge.client.event.RenderWorldEvent;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.lwjgl.opengl.GL11;
-import tv.twitch.chat.ChatEvent;
 import undercurrentcore.persist.UCBlockDTO;
 import undercurrentcore.persist.UCPlayersWorldData;
-import undercurrentcore.server.ServerWrapper;
-
-import java.awt.*;
-import java.io.IOException;
 
 public class UCEventHandler {
 

@@ -1,15 +1,17 @@
 package api.undercurrent.iface.editorTypes;
 
+import api.undercurrent.iface.UCEditorType;
+
 /**
  * Created by Niel on 10/16/2015.
  */
-public class StringEditorType extends EditorType {
+public class StringUCEditorType extends UCEditorType {
 
     private int minLength;
     private int maxLength;
 
-    public StringEditorType(String fieldName, String fieldValue, String displayName, String displayDescription, int minLength, int maxLength) {
-        super(EditorTypes.STRING);
+    public StringUCEditorType(String fieldName, String fieldValue, String displayName, String displayDescription, int minLength, int maxLength, String editorGroup) {
+        super(EditorTypes.STRING, editorGroup);
         this.fieldName = fieldName;
         this.fieldValue = fieldValue;
         this.displayName = displayName;

@@ -1,23 +1,23 @@
 package api.undercurrent.iface.editorTypes;
 
+import api.undercurrent.iface.UCEditorType;
+
 /**
  * Created by Niel on 10/16/2015.
  */
-public class DoubleEditorType extends EditorType {
+public class IntegerUCEditorType extends UCEditorType {
 
-    private int fieldPrecision;
-    private double maxValue;
-    private double minValue;
+    private int minValue;
+    private int maxValue;
 
-    public DoubleEditorType(String fieldName, double fieldValue, String displayName, String displayDescription, int fieldPrecision, double maxValue, double minValue) throws Exception {
-        super(EditorTypes.DOUBLE);
+    public IntegerUCEditorType(String fieldName, int fieldValue, String displayName, String displayDescription, int minValue, int maxValue, String editorGroup) {
+        super(EditorTypes.INT, editorGroup);
         this.fieldName = fieldName;
         this.fieldValue = fieldValue;
         this.displayName = displayName;
         this.displayDescription = displayDescription;
-        this.fieldPrecision = fieldPrecision;
-        this.maxValue = maxValue;
         this.minValue = minValue;
+        this.maxValue = maxValue;
     }
 
     public String getFieldName() {
@@ -25,7 +25,7 @@ public class DoubleEditorType extends EditorType {
     }
 
     public Object getFieldValue() {
-        return (Double) fieldValue;
+        return (Integer) fieldValue;
     }
 
     public String getDisplayName() {
@@ -36,22 +36,18 @@ public class DoubleEditorType extends EditorType {
         return displayDescription;
     }
 
-    public int getFieldPrecision() {
-        return fieldPrecision;
-    }
-
-    public double getMaxValue() {
-        return maxValue;
-    }
-
-    public double getMinValue() {
+    public int getMinValue() {
         return minValue;
+    }
+
+    public int getMaxValue() {
+        return maxValue;
     }
 
     @Override
     public boolean validateValue(Object obj) throws Exception {
         try {
-            double objcast = Double.valueOf(String.valueOf(obj));
+            double objcast = Integer.valueOf(String.valueOf(obj));
 
             if (objcast > getMaxValue()) {
                 return false;
@@ -66,5 +62,4 @@ public class DoubleEditorType extends EditorType {
             return false;
         }
     }
-
 }
