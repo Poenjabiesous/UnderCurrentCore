@@ -199,8 +199,7 @@ public class UCTileEditorImplServlet extends HttpServlet {
                         }
                     }
 
-
-                    if (!editableFields.contains(currentIteration.get("fieldName").getAsString())) {
+                    if (!editableFieldsHashed.contains(currentIteration.get("fieldName").getAsString())) {
                         RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.SPECIFIED_EDITABLEFIELD_NOT_EDITABLE.toString() + "::" + currentIteration.get("fieldName").getAsString());
                         resp.getWriter().write(gson.toJson(rro));
                         return;
@@ -251,7 +250,7 @@ public class UCTileEditorImplServlet extends HttpServlet {
             }
             te.getWorldObj().markBlockForUpdate(blockToUpdate.getxCoord(), blockToUpdate.getyCoord(), blockToUpdate.getzCoord());
         }
-        RequestReturnObject rro = new RequestReturnObject(true, ResponseTypes.TE_UPDATE_SUCCESS.toString());
+        RequestReturnObject rro = new RequestReturnObject(true);
         resp.getWriter().write(gson.toJson(rro));
     }
 

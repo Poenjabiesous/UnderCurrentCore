@@ -42,7 +42,7 @@ public class UCPlayerImplServlet extends HttpServlet {
             return;
         }
 
-        resp.getWriter().write(gson.toJson(new RequestReturnObject(false, gson.toJsonTree(playerDTO))));
+        resp.getWriter().write(gson.toJson(new RequestReturnObject(true, gson.toJsonTree(playerDTO))));
 
     }
 

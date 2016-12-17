@@ -1,18 +1,21 @@
 package api.undercurrent.iface;
 
+import java.net.URL;
+
 /**
  * Created by Niel on 10/16/2015.
  */
 public abstract class UCEditorType {
 
-    public EditorTypes editorType;
+    private final EditorTypes editorType;
     public String fieldName;
     public String displayName;
     public String displayDescription;
     public Object fieldValue;
-    public String editorGroup;
+    private final String editorGroup;
+    public URL image;
 
-    public UCEditorType(EditorTypes editorType, String editorGroup) {
+    public UCEditorType(EditorTypes editorType, String editorGroup, URL image) {
         this.editorType = editorType;
         this.editorGroup = editorGroup;
     }
@@ -41,4 +44,11 @@ public abstract class UCEditorType {
         return displayDescription;
     }
 
+    public String getEditorGroup() {
+        return editorGroup;
+    }
+
+    public URL getImage() {
+        return image;
+    }
 }

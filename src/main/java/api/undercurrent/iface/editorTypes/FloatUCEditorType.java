@@ -3,6 +3,7 @@ package api.undercurrent.iface.editorTypes;
 import api.undercurrent.iface.UCEditorType;
 
 import java.lang.Float;
+import java.net.URL;
 
 public class FloatUCEditorType extends UCEditorType {
 
@@ -10,8 +11,8 @@ public class FloatUCEditorType extends UCEditorType {
     private double maxValue;
     private double minValue;
 
-    public FloatUCEditorType(String fieldName, float fieldValue, String displayName, String displayDescription, int fieldPrecision, float maxValue, float minValue, String editorGroup) throws Exception {
-        super(EditorTypes.FLOAT, editorGroup);
+    public FloatUCEditorType(String fieldName, float fieldValue, String displayName, String displayDescription, int fieldPrecision, float maxValue, float minValue, String editorGroup, URL image) throws Exception {
+        super(EditorTypes.FLOAT, editorGroup, image);
         this.fieldName = fieldName;
         this.fieldValue = fieldValue;
         this.displayName = displayName;

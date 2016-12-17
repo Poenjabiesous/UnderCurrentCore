@@ -179,7 +179,7 @@ public class UCTileInvokableImplServlet extends HttpServlet {
         List<UCEditorType> invokableParams = new ArrayList<>();
 
         try {
-            invokableParamsDef = ((IUCTile) te).getCustomInvokables().get(data.get("invokableName")).getParameters();
+            invokableParamsDef = ((IUCTile) te).getCustomInvokables().get(data.get("invokableName").getAsString()).getParameters();
         } catch (Exception e) {
             RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.ERROR_GETTING_TILE_CUSTOMIVOKABLES.toString() + ": " + Throwables.getStackTraceAsString(e));
             resp.getWriter().write(gson.toJson(rro));
@@ -204,10 +204,13 @@ public class UCTileInvokableImplServlet extends HttpServlet {
                 }
 
 
-                for (UCEditorType UCEditorType : invokableParamsDef) {
-                    if (UCEditorType.getFieldName().equals(currentIteration.get("fieldName").getAsString())) {
-                        if (UCEditorType.validateValue(currentIteration.get("fieldValue"))) {
-                            invokableParams.add(gson.fromJson(currentIteration, UCEditorType.getClass()));
+                for (UCEditorType ucEditorType : invokableParamsDef) {
+                    if (ucEditorType.getFieldName().equals(currentIteration.get("fieldName").getAsString())) {
+                        if (ucEditorType.validateValue(currentIteration.get("fieldValue"))) {
+                            invokableParams.add(gson.fromJson(currentIteration, ucEditorType.getClass()));
+                            UCEditorType copiedEditorType = ucEditorType;
+                            copiedEditorType.fieldValue = currentIteration.get("fieldValue");
+                            invokableParams.add(copiedEditorType);
                         } else {
                             RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.VALUE_NOT_VALID_FOR_FIELD.toString() + "::" + currentIteration.get("fieldName").getAsString());
                             resp.getWriter().write(gson.toJson(rro));
@@ -224,19 +227,25 @@ public class UCTileInvokableImplServlet extends HttpServlet {
             }
         }
 
-        for (UCEditorType UCEditorTypeDef : invokableParamsDef) {
+        int countedParams = 0;
+        int neededParams = invokableParamsDef.size();
+
+        for (UCEditorType ucEditorTypeDef : invokableParamsDef) {
             for (UCEditorType UCEditorType : invokableParams) {
-                if (UCEditorTypeDef.getFieldName().equals(UCEditorType.fieldName)) {
-                    continue;
+                if (ucEditorTypeDef.fieldName.equals(UCEditorType.fieldName)) {
+                    countedParams++;
                 }
             }
-            RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.MISSING_PARAMETER_FOR_INVOKABLE.toString() + "::" + UCEditorTypeDef.getFieldName());
+        }
+
+        if (countedParams != neededParams) {
+            RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.REQUEST_PARAMS_FOR_INVOKABLE_NOT_EQUAL_TO_NEEDED_AMOUNT.toString() + ": NEEDED COUNT: " + neededParams + ", REQUEST MATCHED COUNT: " + countedParams);
             resp.getWriter().write(gson.toJson(rro));
             return;
         }
 
         try {
-            ((IUCTile) te).getCustomInvokables().get(data.get("invokableName")).invoke(te, invokableParams);
+            ((IUCTile) te).getCustomInvokables().get(data.get("invokableName").getAsString()).invoke(te, invokableParams);
             te.getWorldObj().markBlockForUpdate(blockToUpdate.getxCoord(), blockToUpdate.getyCoord(), blockToUpdate.getzCoord());
         } catch (Exception e) {
             RequestReturnObject rro = new RequestReturnObject(false, ResponseTypes.ERROR_WHILE_INVOKING_CUSTOMINVOKABLE.toString() + ": " + Throwables.getStackTraceAsString(e));

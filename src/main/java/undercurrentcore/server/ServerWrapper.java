@@ -10,6 +10,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import undercurrentcore.persist.UCConfiguration;
 import undercurrentcore.server.servletHandlers.UCPlayerImplServlet;
 import undercurrentcore.server.servletHandlers.UCTileEditorImplServlet;
+import undercurrentcore.server.servletHandlers.UCTileInvokableImplServlet;
 
 import javax.servlet.DispatcherType;
 import java.util.EnumSet;
@@ -31,8 +32,9 @@ public class ServerWrapper {
 
         ServletContextHandler contextApi = new ServletContextHandler(ServletContextHandler.SESSIONS);
         contextApi.setContextPath("/undercurrentcore");
-        contextApi.addServlet(new ServletHolder(new UCTileEditorImplServlet()), "/core");
-        contextApi.addServlet(new ServletHolder(new UCPlayerImplServlet()), "/auth");
+        contextApi.addServlet(new ServletHolder(new UCTileEditorImplServlet()), "/tile");
+        contextApi.addServlet(new ServletHolder(new UCPlayerImplServlet()), "/player");
+        contextApi.addServlet(new ServletHolder(new UCTileInvokableImplServlet()), "/invoke");
         FilterHolder corsApi = contextApi.addFilter(CrossOriginFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
         corsApi.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, "*");
         corsApi.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*");

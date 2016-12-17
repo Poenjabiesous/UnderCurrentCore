@@ -29,7 +29,7 @@ public class UCEventHandler {
             if (event.entity instanceof EntityPlayer) {
                 EntityPlayer player = (EntityPlayer) event.entity;
 
-                UCPlayersWorldData data = (UCPlayersWorldData) DimensionManager.getWorld(0).perWorldStorage.loadData(UCPlayersWorldData.class, UCPlayersWorldData.GLOBAL_TAG);
+                UCPlayersWorldData data = UCPlayersWorldData.get();
 
                 if (data == null) {
                     data = new UCPlayersWorldData(UCPlayersWorldData.GLOBAL_TAG);
@@ -48,7 +48,7 @@ public class UCEventHandler {
                     }
 
                     //Check if placed blocks still exist
-                    for (UCBlockDTO block : data.getUCPlayerInfo(secretKey).getBlocks()) {
+                    for (UCBlockDTO block : data.getPlayerBlocks(secretKey)) {
                         if ((DimensionManager.getWorld(block.getDim()).getTileEntity(block.getxCoord(), block.getyCoord(), block.getzCoord()) instanceof IUCTile)) {
                             data.removeBlockFromPlayer(secretKey, block);
                         }
